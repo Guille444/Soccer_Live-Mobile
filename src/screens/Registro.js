@@ -1,11 +1,76 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Image, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Image, ImageBackground, Alert } from 'react-native';
+import * as Constantes from '../../utils/constantes';
 
 export default function Registro({ navigation }) {
 
-    // Función para navegar hacia la pantalla de Sesion
-    const irLogin = async () => {
-        navigation.navigate('Sesion');
+    const ip = Constantes.IP;
+
+    const [nombre, setNombre] = useState('');
+    const [apellido, setApellido] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [email, setEmail] = useState('');
+    const [clave, setClave] = useState('');
+    const [confirmarClave, setConfirmarClave] = useState('');
+
+    // Expresión regular para validar el formato de teléfono
+    const telefonoRegex = /^\d{4}-\d{4}$/;
+
+    const handleTextChange = (text) => {
+        // Eliminar todos los caracteres no numéricos
+        let formatted = text.replace(/[^\d]/g, '');
+
+        // Limitar la longitud a 8 caracteres
+        if (formatted.length > 8) {
+            formatted = formatted.slice(0, 8);
+        }
+
+        // Agregar el guion después del cuarto dígito
+        if (formatted.length > 4) {
+            formatted = formatted.slice(0, 4) + '-' + formatted.slice(4);
+        }
+
+        setTelefono(formatted);
+    };
+
+    const handleCreate = async () => {
+        try {
+            // Validar los campos
+            if (!nombre.trim() || !apellido.trim() || !direccion.trim() || !telefono.trim() ||
+                !email.trim() || !clave.trim() || !confirmarClave.trim()) {
+                Alert.alert("Debes llenar todos los campos");
+                return;
+            } else if (!telefonoRegex.test(telefono)) {
+                Alert.alert("El teléfono debe tener el formato correcto (####-####)");
+                return;
+            }
+
+            // Si todos los campos son válidos, proceder con la creación del usuario
+            const formData = new FormData();
+            formData.append('nombreCliente', nombre);
+            formData.append('apellidoCliente', apellido);
+            formData.append('direccionCliente', direccion);
+            formData.append('telefonoCliente', telefono);
+            formData.append('correoCliente', email);
+            formData.append('claveCliente', clave);
+            formData.append('confirmarClave', confirmarClave);
+
+            const response = await fetch(`${ip}/services/public/cliente.php?action=signUp`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.status) {
+                Alert.alert('Cuenta registrada correctamente');
+                navigation.navigate('Login');
+            } else {
+                Alert.alert('Error', data.error);
+            }
+        } catch (error) {
+            Alert.alert('Ocurrió un problema al registrar la cuenta');
+        }
     };
 
     return (
@@ -17,14 +82,60 @@ export default function Registro({ navigation }) {
                     </TouchableOpacity>
                     <Text style={styles.title}>Registrarse</Text>
                 </View>
-                <TextInput style={styles.input} placeholder="Nombre" placeholderTextColor="#fff" />
-                <TextInput style={styles.input} placeholder="Apellido" placeholderTextColor="#fff" />
-                <TextInput style={styles.input} placeholder="Dirección" placeholderTextColor="#fff" />
-                <TextInput style={styles.input} placeholder="Teléfono" placeholderTextColor="#fff" keyboardType="phone-pad" />
-                <TextInput style={styles.input} placeholder="Correo electrónico" placeholderTextColor="#fff" keyboardType="email-address" />
-                <TextInput style={styles.input} placeholder="Contraseña" placeholderTextColor="#fff" secureTextEntry={true} />
-                <TextInput style={styles.input} placeholder="Confirmar contraseña" placeholderTextColor="#fff" secureTextEntry={true} />
-                <TouchableOpacity onPress={irLogin} style={styles.button}>
+                <TextInput
+                    value={nombre}
+                    onChangeText={setNombre}
+                    style={styles.input}
+                    placeholder="Nombre"
+                    placeholderTextColor="#fff"
+                />
+                <TextInput
+                    value={apellido}
+                    onChangeText={setApellido}
+                    style={styles.input}
+                    placeholder="Apellido"
+                    placeholderTextColor="#fff"
+                />
+                <TextInput
+                    value={direccion}
+                    onChangeText={setDireccion}
+                    style={styles.input}
+                    placeholder="Dirección"
+                    placeholderTextColor="#fff"
+                />
+                <TextInput
+                    value={telefono}
+                    onChangeText={handleTextChange}
+                    style={styles.input}
+                    placeholder="Teléfono"
+                    placeholderTextColor="#fff"
+                    keyboardType="phone-pad"
+                />
+                <TextInput
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.input}
+                    placeholder="Correo electrónico"
+                    placeholderTextColor="#fff"
+                    keyboardType="email-address"
+                />
+                <TextInput
+                    value={clave}
+                    onChangeText={setClave}
+                    style={styles.input}
+                    placeholder="Contraseña"
+                    placeholderTextColor="#fff"
+                    secureTextEntry={true}
+                />
+                <TextInput
+                    value={confirmarClave}
+                    onChangeText={setConfirmarClave}
+                    style={styles.input}
+                    placeholder="Confirmar contraseña"
+                    placeholderTextColor="#fff"
+                    secureTextEntry={true}
+                />
+                <TouchableOpacity onPress={handleCreate} style={styles.button}>
                     <Text style={styles.buttonText}>REGISTRARSE</Text>
                 </TouchableOpacity>
             </ScrollView>
