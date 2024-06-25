@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Image, ImageBackground, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Image, ImageBackground } from 'react-native';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
 export default function Registro({ navigation }) {
@@ -13,40 +14,39 @@ export default function Registro({ navigation }) {
     const [email, setEmail] = useState('');
     const [clave, setClave] = useState('');
     const [confirmarClave, setConfirmarClave] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [isRegistering, setIsRegistering] = useState(false);
 
-    // Expresión regular para validar el formato de teléfono
     const telefonoRegex = /^\d{4}-\d{4}$/;
 
     const handleTextChange = (text) => {
-        // Eliminar todos los caracteres no numéricos
         let formatted = text.replace(/[^\d]/g, '');
-
-        // Limitar la longitud a 8 caracteres
         if (formatted.length > 8) {
             formatted = formatted.slice(0, 8);
         }
-
-        // Agregar el guion después del cuarto dígito
         if (formatted.length > 4) {
             formatted = formatted.slice(0, 4) + '-' + formatted.slice(4);
         }
-
         setTelefono(formatted);
     };
 
-    const handleCreate = async () => {
-        try {
-            // Validar los campos
-            if (!nombre.trim() || !apellido.trim() || !direccion.trim() || !telefono.trim() ||
-                !email.trim() || !clave.trim() || !confirmarClave.trim()) {
-                Alert.alert("Debes llenar todos los campos");
-                return;
-            } else if (!telefonoRegex.test(telefono)) {
-                Alert.alert("El teléfono debe tener el formato correcto (####-####)");
-                return;
-            }
+    const showAlertWithMessage = (message) => {
+        setAlertMessage(message);
+        setShowAlert(true);
+    };
 
-            // Si todos los campos son válidos, proceder con la creación del usuario
+    const handleCreate = async () => {
+        if (!nombre.trim() || !apellido.trim() || !direccion.trim() || !telefono.trim() ||
+            !email.trim() || !clave.trim() || !confirmarClave.trim()) {
+            showAlertWithMessage("Debes llenar todos los campos");
+            return;
+        } else if (!telefonoRegex.test(telefono)) {
+            showAlertWithMessage("El teléfono debe tener el formato correcto (####-####)");
+            return;
+        }
+
+        try {
             const formData = new FormData();
             formData.append('nombreCliente', nombre);
             formData.append('apellidoCliente', apellido);
@@ -63,13 +63,17 @@ export default function Registro({ navigation }) {
 
             const data = await response.json();
             if (data.status) {
-                Alert.alert('Cuenta registrada correctamente');
-                navigation.navigate('Login');
+                showAlertWithMessage('Cuenta registrada correctamente');
+                setIsRegistering(true);
+                setTimeout(() => {
+                    setShowAlert(false);
+                    navigation.navigate('Login');
+                }, 2000);
             } else {
-                Alert.alert('Error', data.error);
+                showAlertWithMessage(data.error);
             }
         } catch (error) {
-            Alert.alert('Ocurrió un problema al registrar la cuenta');
+            showAlertWithMessage('Ocurrió un problema al registrar la cuenta');
         }
     };
 
@@ -138,6 +142,26 @@ export default function Registro({ navigation }) {
                 <TouchableOpacity onPress={handleCreate} style={styles.button}>
                     <Text style={styles.buttonText}>REGISTRARSE</Text>
                 </TouchableOpacity>
+                <AwesomeAlert
+                    show={showAlert}
+                    showProgress={isRegistering}
+                    title={isRegistering ? "Registrando" : "Mensaje"}
+                    message={alertMessage}
+                    closeOnTouchOutside={!isRegistering}
+                    closeOnHardwareBackPress={!isRegistering}
+                    showCancelButton={false}
+                    showConfirmButton={!isRegistering}
+                    confirmText="OK"
+                    confirmButtonColor="#DD6B55"
+                    onConfirmPressed={() => {
+                        setShowAlert(false);
+                    }}
+                    contentContainerStyle={styles.alertContentContainer}
+                    titleStyle={styles.alertTitle}
+                    messageStyle={styles.alertMessage}
+                    confirmButtonStyle={styles.alertConfirmButton}
+                    confirmButtonTextStyle={styles.alertConfirmButtonText}
+                />
             </ScrollView>
         </ImageBackground>
     );
@@ -173,11 +197,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         justifyContent: 'center',
     },
-    subtitle: {
-        fontSize: 18,
-        color: '#fff',
-        marginBottom: 24,
-    },
     input: {
         width: '100%',
         height: 50,
@@ -202,5 +221,25 @@ const styles = StyleSheet.create({
         color: '#0A305E',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    alertContentContainer: {
+        borderRadius: 10,
+        padding: 20,
+    },
+    alertTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    alertMessage: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    alertConfirmButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    alertConfirmButtonText: {
+        fontSize: 16,
     },
 });

@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
 export default function Login({ navigation }) {
     const ip = Constantes.IP;
 
-    const [isContra, setIsContra] = useState(true)
-    const [usuario, setUsuario] = useState('')
-    const [contrasenia, setContrasenia] = useState('')
+    const [isContra, setIsContra] = useState(true);
+    const [usuario, setUsuario] = useState('');
+    const [contrasenia, setContrasenia] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     const validarSesion = async () => {
         try {
-            // Validar los campos
-            if (!usuario.trim() || !contrasenia.trim()) {
-                Alert.alert("Debes llenar todos los campos");
-                return;
-            }
             const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
                 method: 'GET'
             });
@@ -24,14 +23,15 @@ export default function Login({ navigation }) {
 
             if (data.status === 1) {
                 cerrarSesion();
-                console.log("Se eliminó la sesión")
+                console.log("Se eliminó la sesión");
             } else {
-                console.log("No hay sesión activa")
-                return
+                console.log("No hay sesión activa");
+                return;
             }
         } catch (error) {
             console.error(error);
-            Alert.alert('Error', 'Ocurrió un error al validar la sesión');
+            setAlertMessage('Ocurrió un error al validar la sesión');
+            setShowAlert(true);
         }
     }
 
@@ -44,16 +44,24 @@ export default function Login({ navigation }) {
             const data = await response.json();
 
             if (data.status) {
-                console.log("Sesión Finalizada")
+                console.log("Sesión Finalizada");
             } else {
-                console.log('No se pudo eliminar la sesión')
+                console.log('No se pudo eliminar la sesión');
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            Alert.alert('Error', 'Ocurrió un error al iniciar sesión con bryancito');
+            setAlertMessage('Ocurrió un error al cerrar sesión');
+            setShowAlert(true);
         }
     }
+
     const handlerLogin = async () => {
+        if (!usuario.trim() || !contrasenia.trim()) {
+            setAlertMessage('Por favor completa todos los campos');
+            setShowAlert(true);
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append('correo', usuario);
@@ -67,20 +75,28 @@ export default function Login({ navigation }) {
             const data = await response.json();
 
             if (data.status) {
-                setContrasenia('')
-                setUsuario('')
-                navigation.navigate('TabNavigator');
+                setContrasenia('');
+                setUsuario('');
+                setAlertMessage('¡Bienvenido!');
+                setShowAlert(true);
+                setIsLoggingIn(true);
+                // Espera 2 segundos antes de navegar
+                setTimeout(() => {
+                    setShowAlert(false);
+                    navigation.navigate('TabNavigator');
+                }, 2000);
             } else {
                 console.log(data);
-                Alert.alert('Error sesión', data.error);
+                setAlertMessage(data.error);
+                setShowAlert(true);
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            Alert.alert('Error', 'Ocurrió un error al iniciar sesión');
+            setAlertMessage('Ocurrió un error al iniciar sesión');
+            setShowAlert(true);
         }
     };
 
-    // Función para navegar hacia la pantalla de registro
     const irRegistrar = async () => {
         navigation.navigate('Registro');
     };
@@ -92,7 +108,7 @@ export default function Login({ navigation }) {
             <View style={styles.container}>
                 <View style={styles.logoContainer}>
                     <Image
-                        source={require('../img/logo-no-background.png')} // Asegúrate de que esta ruta es correcta
+                        source={require('../img/logo-no-background.png')}
                         style={styles.logo}
                         resizeMode='contain'
                     />
@@ -123,6 +139,26 @@ export default function Login({ navigation }) {
                 <TouchableOpacity onPress={handlerLogin} style={styles.loginButton}>
                     <Text style={styles.loginButtonText}>INICIAR SESIÓN</Text>
                 </TouchableOpacity>
+                <AwesomeAlert
+                    show={showAlert}
+                    showProgress={isLoggingIn}
+                    title="Alerta"
+                    message={alertMessage}
+                    closeOnTouchOutside={!isLoggingIn}
+                    closeOnHardwareBackPress={!isLoggingIn}
+                    showCancelButton={false}
+                    showConfirmButton={!isLoggingIn}
+                    confirmText="OK"
+                    confirmButtonColor="#DD6B55"
+                    onConfirmPressed={() => {
+                        setShowAlert(false);
+                    }}
+                    contentContainerStyle={styles.alertContentContainer}
+                    titleStyle={styles.alertTitle}
+                    messageStyle={styles.alertMessage}
+                    confirmButtonStyle={styles.alertConfirmButton}
+                    confirmButtonTextStyle={styles.alertConfirmButtonText}
+                />
             </View>
         </ImageBackground>
     );
@@ -192,5 +228,25 @@ const styles = StyleSheet.create({
     logo: {
         width: 200,
         height: 150,
+    },
+    alertContentContainer: {
+        borderRadius: 10,
+        padding: 20,
+    },
+    alertTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    alertMessage: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    alertConfirmButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    alertConfirmButtonText: {
+        fontSize: 16,
     },
 });
