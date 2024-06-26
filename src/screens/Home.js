@@ -36,10 +36,11 @@ export default function Home({ navigation }) {
         navigation.setOptions({
             headerTitle: 'Inicio', // Título del header
             headerTitleAlign: 'center', // Centrar el título en el header
+            headerTransparent: true, // Hacer el header transparente
             headerStyle: {
-                backgroundColor: '#081F49', // Color de fondo del header
+                backgroundColor: 'transparent', // Color de fondo del header
             },
-            headerTintColor: '#A8E910', // Color del texto del header
+            headerTintColor: '#fff', // Color del texto del header
         });
     }, []);
 

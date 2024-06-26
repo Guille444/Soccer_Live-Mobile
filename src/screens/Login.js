@@ -11,7 +11,7 @@ export default function Login({ navigation }) {
     const [contrasenia, setContrasenia] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [showProgress, setShowProgress] = useState(false);
 
     const validarSesion = async () => {
         try {
@@ -52,8 +52,9 @@ export default function Login({ navigation }) {
         }
     };
 
-    const showAlertWithMessage = (message) => {
+    const showAlertWithMessage = (message, showProgressIndicator = false) => {
         setAlertMessage(message);
+        setShowProgress(showProgressIndicator);
         setShowAlert(true);
     };
 
@@ -63,7 +64,7 @@ export default function Login({ navigation }) {
             return;
         }
 
-        setIsLoggingIn(true);
+        showAlertWithMessage('Iniciando sesión...', true);
 
         try {
             const formData = new FormData();
@@ -82,19 +83,18 @@ export default function Login({ navigation }) {
                 setUsuario('');
                 showAlertWithMessage('¡Bienvenido!');
                 setTimeout(() => {
-                    setIsLoggingIn(false);
-                    setShowAlert(false);
                     navigation.navigate('TabNavigator');
+                    setShowAlert(false);
                 }, 2000);
             } else {
                 console.log(data);
                 showAlertWithMessage(data.error);
-                setIsLoggingIn(false);
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
             showAlertWithMessage('Ocurrió un error al iniciar sesión');
-            setIsLoggingIn(false);
+        } finally {
+            setShowProgress(false);
         }
     };
 
@@ -144,13 +144,13 @@ export default function Login({ navigation }) {
                 </TouchableOpacity>
                 <AwesomeAlert
                     show={showAlert}
-                    showProgress={isLoggingIn}
+                    showProgress={showProgress}
                     title="Alerta"
                     message={alertMessage}
-                    closeOnTouchOutside={!isLoggingIn}
-                    closeOnHardwareBackPress={!isLoggingIn}
+                    closeOnTouchOutside={!showProgress}
+                    closeOnHardwareBackPress={!showProgress}
                     showCancelButton={false}
-                    showConfirmButton={!isLoggingIn}
+                    showConfirmButton={!showProgress}
                     confirmText="OK"
                     confirmButtonColor="#DD6B55"
                     onConfirmPressed={() => {
