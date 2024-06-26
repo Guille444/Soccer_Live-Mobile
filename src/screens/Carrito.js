@@ -2,17 +2,19 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 
 export default function Home({ navigation }) {
-    // Título del encabezado de navegación
+
     useEffect(() => {
+        // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: () => (
-                <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>Carrito</Text>
-                </View>
-            ),
-            headerTitleAlign: 'center',
+            headerTitle: 'Carrito', // Título del header
+            headerTitleAlign: 'center', // Centrar el título en el header
+            headerStyle: {
+                backgroundColor: '#081F49', // Color de fondo del header
+            },
+            headerTintColor: '#A8E910', // Color del texto del header
         });
     }, []);
+
 
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>

@@ -26,14 +26,12 @@ export default function Login({ navigation }) {
                 console.log("Se eliminó la sesión");
             } else {
                 console.log("No hay sesión activa");
-                return;
             }
         } catch (error) {
             console.error(error);
-            setAlertMessage('Ocurrió un error al validar la sesión');
-            setShowAlert(true);
+            showAlertWithMessage('Ocurrió un error al validar la sesión');
         }
-    }
+    };
 
     const cerrarSesion = async () => {
         try {
@@ -50,17 +48,22 @@ export default function Login({ navigation }) {
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            setAlertMessage('Ocurrió un error al cerrar sesión');
-            setShowAlert(true);
+            showAlertWithMessage('Ocurrió un error al cerrar sesión');
         }
-    }
+    };
+
+    const showAlertWithMessage = (message) => {
+        setAlertMessage(message);
+        setShowAlert(true);
+    };
 
     const handlerLogin = async () => {
         if (!usuario.trim() || !contrasenia.trim()) {
-            setAlertMessage('Por favor completa todos los campos');
-            setShowAlert(true);
+            showAlertWithMessage('Por favor completa todos los campos');
             return;
         }
+
+        setIsLoggingIn(true);
 
         try {
             const formData = new FormData();
@@ -77,23 +80,21 @@ export default function Login({ navigation }) {
             if (data.status) {
                 setContrasenia('');
                 setUsuario('');
-                setAlertMessage('¡Bienvenido!');
-                setShowAlert(true);
-                setIsLoggingIn(true);
-                // Espera 2 segundos antes de navegar
+                showAlertWithMessage('¡Bienvenido!');
                 setTimeout(() => {
+                    setIsLoggingIn(false);
                     setShowAlert(false);
                     navigation.navigate('TabNavigator');
                 }, 2000);
             } else {
                 console.log(data);
-                setAlertMessage(data.error);
-                setShowAlert(true);
+                showAlertWithMessage(data.error);
+                setIsLoggingIn(false);
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            setAlertMessage('Ocurrió un error al iniciar sesión');
-            setShowAlert(true);
+            showAlertWithMessage('Ocurrió un error al iniciar sesión');
+            setIsLoggingIn(false);
         }
     };
 
@@ -101,7 +102,9 @@ export default function Login({ navigation }) {
         navigation.navigate('Registro');
     };
 
-    useEffect(() => { validarSesion() }, [])
+    useEffect(() => {
+        validarSesion();
+    }, []);
 
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>

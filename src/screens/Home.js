@@ -5,6 +5,7 @@ import * as Constantes from '../../utils/constantes';
 
 export default function Home({ navigation }) {
     const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
     const ip = Constantes.IP;
 
     const handleLogout = async () => {
@@ -14,28 +15,31 @@ export default function Home({ navigation }) {
             });
             const data = await response.json();
             if (data.status) {
+                setAlertMessage("Has cerrado sesión exitosamente.");
                 setShowAlert(true);
                 setTimeout(() => {
                     setShowAlert(false);
                     navigation.navigate('Login');
                 }, 2000); // Ajusta el tiempo según sea necesario
             } else {
+                setAlertMessage("Error al cerrar sesión.");
                 setShowAlert(true);
             }
         } catch (error) {
+            setAlertMessage("Error de red.");
             setShowAlert(true);
         }
     };
 
-    // Título del encabezado de navegación
     useEffect(() => {
+        // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: () => (
-                <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>Inicio</Text>
-                </View>
-            ),
-            headerTitleAlign: 'center',
+            headerTitle: 'Inicio', // Título del header
+            headerTitleAlign: 'center', // Centrar el título en el header
+            headerStyle: {
+                backgroundColor: '#081F49', // Color de fondo del header
+            },
+            headerTintColor: '#A8E910', // Color del texto del header
         });
     }, []);
 
@@ -50,7 +54,8 @@ export default function Home({ navigation }) {
             <AwesomeAlert
                 show={showAlert}
                 showProgress={false}
-                message="Has cerrado sesión exitosamente."
+                title="Alerta"
+                message={alertMessage}
                 closeOnTouchOutside={true}
                 closeOnHardwareBackPress={false}
                 showConfirmButton={true}
@@ -59,6 +64,11 @@ export default function Home({ navigation }) {
                 onConfirmPressed={() => {
                     setShowAlert(false);
                 }}
+                contentContainerStyle={styles.alertContentContainer}
+                titleStyle={styles.alertTitle}
+                messageStyle={styles.alertMessage}
+                confirmButtonStyle={styles.alertConfirmButton}
+                confirmButtonTextStyle={styles.alertConfirmButtonText}
             />
         </ImageBackground>
     );
@@ -107,5 +117,25 @@ const styles = StyleSheet.create({
         color: '#0A305E',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    alertContentContainer: {
+        borderRadius: 10,
+        padding: 20,
+    },
+    alertTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    alertMessage: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    alertConfirmButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    alertConfirmButtonText: {
+        fontSize: 16,
     },
 });

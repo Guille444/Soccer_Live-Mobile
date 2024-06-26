@@ -46,6 +46,8 @@ export default function Registro({ navigation }) {
             return;
         }
 
+        setIsRegistering(true);
+
         try {
             const formData = new FormData();
             formData.append('nombreCliente', nombre);
@@ -64,7 +66,6 @@ export default function Registro({ navigation }) {
             const data = await response.json();
             if (data.status) {
                 showAlertWithMessage('Cuenta registrada correctamente');
-                setIsRegistering(true);
                 setTimeout(() => {
                     setShowAlert(false);
                     navigation.navigate('Login');
@@ -74,6 +75,8 @@ export default function Registro({ navigation }) {
             }
         } catch (error) {
             showAlertWithMessage('Ocurrió un problema al registrar la cuenta');
+        } finally {
+            setIsRegistering(false);
         }
     };
 

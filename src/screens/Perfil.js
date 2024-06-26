@@ -8,13 +8,14 @@ export default function Perfil({ navigation }) {
     const ip = Constantes.IP;
 
     useEffect(() => {
+        // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: () => (
-                <View style={styles.headerTitleContainer}>
-                    <Text style={styles.headerTitle}>Perfil</Text>
-                </View>
-            ),
-            headerTitleAlign: 'center',
+            headerTitle: 'Perfil', // Título del header
+            headerTitleAlign: 'center', // Centrar el título en el header
+            headerStyle: {
+                backgroundColor: '#081F49', // Color de fondo del header
+            },
+            headerTintColor: '#A8E910', // Color del texto del header
         });
     }, []);
 
