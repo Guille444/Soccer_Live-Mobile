@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 
-export default function Home({ navigation }) {
+export default function Productos({ navigation }) {
 
     useEffect(() => {
         // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: 'Historial', // Título del header
+            headerTitle: 'Porductos', // Título del header
             headerTitleAlign: 'center', // Centrar el título en el header
             headerTransparent: true, // Hacer el header transparente
             headerStyle: {
@@ -20,7 +20,7 @@ export default function Home({ navigation }) {
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <View style={styles.container}>
-                <Text style={styles.welcomeText}>¡Bienvenido a la pantalla de Historial de compras!</Text>
+                <Text style={styles.welcomeText}>¡Bienvenido a la pantalla de Productos!</Text>
             </View>
         </ImageBackground>
     );

@@ -7,6 +7,7 @@ import Home from '../screens/Home';
 import Carrito from '../screens/Carrito';
 import Historial from '../screens/Historial';
 import Perfil from '../screens/Perfil';
+import Productos from '../screens/Productos'; // Importa el nuevo componente de pantalla
 
 const Tab = createBottomTabNavigator();
 
@@ -16,11 +17,19 @@ const TabNavigator = () => {
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: '#A8E910', // Color de los íconos activos
         tabBarInactiveTintColor: '#fff', // Color de los íconos inactivos
-        tabBarStyle: { backgroundColor: '#081F49', height: 60, borderTopWidth: 0 }, // Estilo de la barra de pestañas
+        tabBarStyle: {
+          backgroundColor: 'transparent', // Estilo de la barra de pestañas
+          height: 60,
+          borderTopWidth: 0,
+          position: 'absolute', // Esto asegura que la barra de pestañas no ocupe espacio y permita ver el fondo detrás de ella
+          elevation: 0, // Elimina la sombra en Android
+        },
         tabBarIcon: ({ focused, color, size }) => { // Función que define el ícono de la pestaña
           let iconName;
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Productos') {
+            iconName = focused ? 'basket' : 'basket-outline';
           } else if (route.name === 'Carrito') {
             iconName = focused ? 'cart' : 'cart-outline';
           } else if (route.name === 'Historial') {
@@ -36,6 +45,10 @@ const TabNavigator = () => {
       <Tab.Screen
         name="Home"
         component={Home}
+      />
+      <Tab.Screen
+        name="Productos" // Nueva pestaña de Productos
+        component={Productos}
       />
       <Tab.Screen
         name="Carrito"

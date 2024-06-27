@@ -22,7 +22,7 @@ class ClienteHandler
     *   Métodos para gestionar la cuenta del cliente.
     */
 
-   public function checkUser($username, $password)
+    public function checkUser($username, $password)
     {
         $sql = 'SELECT id_cliente, correo_cliente, clave_cliente, estado_cliente
                 FROM clientes
@@ -81,7 +81,7 @@ class ClienteHandler
                 FROM clientes
                 WHERE id_cliente = ?';
         $params = array($_SESSION['idCliente']);
-        return Database::getRow($sql, $params); 
+        return Database::getRow($sql, $params);
     }
     public function editProfile()
     {
@@ -163,6 +163,15 @@ class ClienteHandler
                 FROM clientes
                 WHERE correo_cliente = ?';
         $params = array($value);
+        return Database::getRow($sql, $params);
+    }
+
+    public function readOneCorreo($correo)
+    {
+        $sql = 'SELECT id_cliente, nombre_cliente, apellido_cliente, direccion_cliente, telefono_cliente, correo_cliente, estado_cliente
+            FROM clientes
+            WHERE correo_cliente = ?';
+        $params = array($correo);
         return Database::getRow($sql, $params);
     }
 }

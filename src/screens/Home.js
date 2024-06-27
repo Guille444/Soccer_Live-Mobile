@@ -4,8 +4,10 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
 export default function Home({ navigation }) {
+    const [nombre, setNombre] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [alertTitle, setAlertTitle] = useState('');
     const ip = Constantes.IP;
 
     const handleLogout = async () => {
@@ -15,32 +17,71 @@ export default function Home({ navigation }) {
             });
             const data = await response.json();
             if (data.status) {
+                setAlertTitle('Éxito');
                 setAlertMessage("Has cerrado sesión exitosamente.");
                 setShowAlert(true);
                 setTimeout(() => {
                     setShowAlert(false);
                     navigation.navigate('Login');
-                }, 2000); // Ajusta el tiempo según sea necesario
+                }, 2000);
             } else {
+                setAlertTitle('Error');
                 setAlertMessage("Error al cerrar sesión.");
                 setShowAlert(true);
             }
         } catch (error) {
-            setAlertMessage("Error de red.");
+            setAlertTitle('Error de red');
+            setAlertMessage("Ocurrió un error de red.");
             setShowAlert(true);
         }
     };
 
+    const getUser = async () => {
+        try {
+            const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
+                method: 'GET'
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log('Server response:', data);
+    
+            if (data.status) {
+                if (data.cliente && data.cliente.nombre_cliente) {
+                    setNombre(data.cliente.nombre_cliente);
+                } else {
+                    setAlertTitle('Error');
+                    setAlertMessage('La respuesta del servidor no contiene el nombre del cliente.');
+                    setShowAlert(true);
+                }
+            } else {
+                setAlertTitle('Error');
+                setAlertMessage(data.error || 'Error desconocido del servidor.');
+                setShowAlert(true);
+            }
+        } catch (error) {
+            setAlertTitle('Error');
+            setAlertMessage(`Ocurrió un error al obtener los datos del usuario: ${error.message}`);
+            setShowAlert(true);
+        }
+    };    
+
     useEffect(() => {
-        // Configurar opciones de navegación
+        getUser();
+    }, []);
+
+    useEffect(() => {
         navigation.setOptions({
-            headerTitle: 'Inicio', // Título del header
-            headerTitleAlign: 'center', // Centrar el título en el header
-            headerTransparent: true, // Hacer el header transparente
+            headerTitle: 'Inicio',
+            headerTitleAlign: 'center',
+            headerTransparent: true,
             headerStyle: {
-                backgroundColor: 'transparent', // Color de fondo del header
+                backgroundColor: 'transparent',
             },
-            headerTintColor: '#fff', // Color del texto del header
+            headerTintColor: '#fff',
         });
     }, []);
 
@@ -49,13 +90,16 @@ export default function Home({ navigation }) {
             <View style={styles.container}>
                 <Text style={styles.welcomeText}>¡Bienvenido a la pantalla de Inicio!</Text>
             </View>
+            <Text style={styles.subtitle}>
+                {nombre ? nombre : 'No hay Nombre para mostrar'}
+            </Text>
             <TouchableOpacity onPress={handleLogout} style={styles.button}>
                 <Text style={styles.buttonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
             <AwesomeAlert
                 show={showAlert}
                 showProgress={false}
-                title="Alerta"
+                title={alertTitle}
                 message={alertMessage}
                 closeOnTouchOutside={true}
                 closeOnHardwareBackPress={false}
@@ -80,9 +124,17 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         height: '100%',
-        resizeMode: 'cover', // Ajusta el tamaño de la imagen según la pantalla
+        resizeMode: 'cover',
         justifyContent: 'center',
         backgroundColor: '#0A305E'
+    },
+    subtitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginTop: 20,
+        marginBottom: 20,
+        color: '#fff',
     },
     container: {
         flex: 1,
@@ -90,20 +142,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
     },
-    headerTitleContainer: {
-        flexDirection: 'row',
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        color: '#000',
-    },
     welcomeText: {
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        color: '#fff', // Ajusta el color del texto según el fondo de la imagen
+        color: '#fff',
     },
     button: {
         width: '100%',
@@ -111,8 +154,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 10,
         borderRadius: 10,
+        marginBottom: 100,
     },
     buttonText: {
         color: '#0A305E',
@@ -127,10 +170,12 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: '#DD6B55',
     },
     alertMessage: {
         fontSize: 18,
         marginBottom: 10,
+        color: '#333',
     },
     alertConfirmButton: {
         paddingHorizontal: 20,
@@ -138,5 +183,6 @@ const styles = StyleSheet.create({
     },
     alertConfirmButtonText: {
         fontSize: 16,
+        color: '#fff',
     },
 });

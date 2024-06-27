@@ -152,7 +152,7 @@ export default function Login({ navigation }) {
                     showCancelButton={false}
                     showConfirmButton={!showProgress}
                     confirmText="OK"
-                    confirmButtonColor="#DD6B55"
+                    confirmButtonColor="gray"
                     onConfirmPressed={() => {
                         setShowAlert(false);
                     }}
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline'
     },
     loginButton: {
-        width: '100%',
+        width: '50%',
         height: 50,
         backgroundColor: '#fff',
         alignItems: 'center',

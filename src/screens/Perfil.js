@@ -92,12 +92,7 @@ export default function Perfil({ navigation }) {
 
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
-            <ScrollView
-                contentContainerStyle={styles.container}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-            >
+            <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.form}>
                     <Text style={styles.sectionTitle}>Mi información</Text>
                     <Text style={styles.label}>Nombre</Text>
