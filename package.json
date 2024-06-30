@@ -20,6 +20,7 @@
     "react-native-awesome-alerts": "^2.0.0",
     "react-native-elements": "^3.4.3",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-picker-select": "^9.1.3",
     "react-native-vector-icons": "^10.1.0"
   },
   "devDependencies": {

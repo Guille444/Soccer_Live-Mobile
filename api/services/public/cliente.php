@@ -111,12 +111,12 @@ if (isset($_GET['action'])) {
             case 'editProfile':
                 $_POST = Validator::validateForm($_POST);
                 if (
+                    !$cliente->setId($_SESSION['idCliente']) ||  // Asegúrate de establecer el ID del cliente
                     !$cliente->setNombre($_POST['nombreCliente']) or
                     !$cliente->setApellido($_POST['apellidoCliente']) or
                     !$cliente->setDireccion($_POST['direccionCliente']) or
                     !$cliente->setTelefono($_POST['telefonoCliente']) or
                     !$cliente->setCorreo($_POST['correoCliente'])
-
                 ) {
                     $result['error'] = $cliente->getDataError();
                 } elseif ($cliente->editProfile()) {

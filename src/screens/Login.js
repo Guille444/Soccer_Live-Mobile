@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     alertConfirmButton: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 20,  
         paddingVertical: 10,
     },
     alertConfirmButtonText: {

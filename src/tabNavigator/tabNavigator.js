@@ -17,13 +17,7 @@ const TabNavigator = () => {
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: '#A8E910', // Color de los íconos activos
         tabBarInactiveTintColor: '#fff', // Color de los íconos inactivos
-        tabBarStyle: {
-          backgroundColor: 'transparent', // Estilo de la barra de pestañas
-          height: 60,
-          borderTopWidth: 0,
-          position: 'absolute', // Esto asegura que la barra de pestañas no ocupe espacio y permita ver el fondo detrás de ella
-          elevation: 0, // Elimina la sombra en Android
-        },
+        tabBarStyle: { backgroundColor: '#081F49', height: 60, borderTopWidth: 0 }, // Estilo de la barra de pestañas
         tabBarIcon: ({ focused, color, size }) => { // Función que define el ícono de la pestaña
           let iconName;
           if (route.name === 'Home') {

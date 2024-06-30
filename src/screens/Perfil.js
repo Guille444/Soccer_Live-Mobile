@@ -1,22 +1,26 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TextInput, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
 export default function Perfil({ navigation }) {
-
     const ip = Constantes.IP;
 
     useEffect(() => {
         // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: 'Perfil', // Título del header
-            headerTitleAlign: 'center', // Centrar el título en el header
-            headerTransparent: true, // Hacer el header transparente
+            headerTitle: 'Perfil',
+            headerTitleAlign: 'center',
+            headerTransparent: true,
             headerStyle: {
-                backgroundColor: 'transparent', // Color de fondo del header
+                backgroundColor: 'transparent',
             },
-            headerTintColor: '#fff', // Color del texto del header
+            headerTintColor: '#fff',
+            headerRight: () => (
+                <TouchableOpacity onPress={handleLogout}>
+                    <Image source={require('../img/logout.png')} style={styles.logoutImage} />
+                </TouchableOpacity>
+            ),
         });
     }, []);
 
@@ -50,7 +54,27 @@ export default function Perfil({ navigation }) {
         }
     };
 
-    const editP = async () => {
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${ip}/services/public/cliente.php?action=logOut`, {
+                method: 'GET'
+            });
+            const data = await response.json();
+            if (data.status) {
+                showAlert('Éxito', "Has cerrado sesión exitosamente.", 'success');
+                setTimeout(() => {
+                    setAlertVisible(false);
+                    navigation.navigate('Login');
+                }, 2000);
+            } else {
+                showAlert('Error', "Error al cerrar sesión.", 'error');
+            }
+        } catch (error) {
+            showAlert('Error de red', "Ocurrió un error de red.", 'error');
+        }
+    };
+
+    const editProfile = async () => {
         try {
             const formData = new FormData();
             formData.append('nombreCliente', profileData.nombre_cliente);
@@ -138,7 +162,7 @@ export default function Perfil({ navigation }) {
                         keyboardType="email-address"
                     />
                 </View>
-                <TouchableOpacity style={styles.button} onPress={editP}>
+                <TouchableOpacity style={styles.button} onPress={editProfile}>
                     <Text style={styles.buttonText}>Guardar</Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -152,7 +176,12 @@ export default function Perfil({ navigation }) {
                 showConfirmButton={true}
                 confirmText="OK"
                 confirmButtonColor={alertType === 'success' ? '#0A305E' : '#DD6B55'}
+                confirmButtonStyle={styles.alertConfirmButton}
+                confirmButtonTextStyle={styles.alertConfirmButtonText}
                 onConfirmPressed={() => setAlertVisible(false)}
+                contentContainerStyle={styles.alertContentContainer}
+                titleStyle={styles.alertTitle}
+                messageStyle={styles.alertMessage}
             />
         </ImageBackground>
     );
@@ -172,24 +201,6 @@ const styles = StyleSheet.create({
         padding: 16,
         paddingTop: 50,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 40,
-        marginTop: 45,
-        justifyContent: 'center',
-        position: 'relative',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 0,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#fff',
-        marginLeft: 10,
-    },
     form: {
         marginBottom: 30,
         width: '100%',
@@ -200,7 +211,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 10,
         textAlign: 'center',
-        marginTop: 40
     },
     label: {
         fontSize: 16,
@@ -214,12 +224,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingLeft: 10,
-        marginBottom: 20,  // Increased spacing between inputs
-        fontSize: 16,
+        marginBottom: 20,
+        fontSize: 18, // Ajuste el tamaño de fuente a 18
         color: '#fff',
     },
     button: {
-        width: '100%',
+        width: '50%',
         height: 50,
         backgroundColor: '#fff',
         alignItems: 'center',
@@ -231,19 +241,36 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    headerTitleContainer: {
-        flexDirection: 'row',
+    logoutImage: {
+        width: 25,
+        height: 25,
+        marginRight: 10,
     },
-    headerTitle: {
+    confirmButton: {
+        paddingHorizontal: 30,
+        paddingVertical: 10,
+    },
+    confirmButtonText: {
         fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        color: '#000',
     },
-    welcomeText: {
-        fontSize: 24,
+    alertContentContainer: {
+        borderRadius: 10,
+        padding: 20,
+    },
+    alertTitle: {
+        fontSize: 22,
         fontWeight: 'bold',
-        textAlign: 'center',
-        color: '#fff', // Ajusta el color del texto según el fondo de la imagen
+        marginBottom: 10,
+    },
+    alertMessage: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    alertConfirmButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    alertConfirmButtonText: {
+        fontSize: 16,
     },
 });

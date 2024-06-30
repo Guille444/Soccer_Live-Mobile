@@ -157,12 +157,19 @@ class ClienteHandler
         return Database::executeRow($sql, $params);
     }
 
-    public function checkDuplicate($value)
+    public function checkDuplicate($value, $idCliente = null)
     {
-        $sql = 'SELECT id_cliente
+        if ($idCliente) {
+            $sql = 'SELECT id_cliente
+                FROM clientes
+                WHERE correo_cliente = ? AND id_cliente != ?';
+            $params = array($value, $idCliente);
+        } else {
+            $sql = 'SELECT id_cliente
                 FROM clientes
                 WHERE correo_cliente = ?';
-        $params = array($value);
+            $params = array($value);
+        }
         return Database::getRow($sql, $params);
     }
 
