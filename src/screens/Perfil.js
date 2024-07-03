@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 10,
         textAlign: 'center',
+        marginTop: 50,
     },
     label: {
         fontSize: 16,

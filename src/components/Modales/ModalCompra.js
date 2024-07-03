@@ -15,7 +15,7 @@ const ModalCompra = ({ visible, cerrarModal, nombreProductoModal, idProductoModa
                 formData.append('idProducto', idProductoModal);
                 formData.append('cantidadProducto', cantidad);
 
-                const response = await fetch(`${ip}/coffeeshop/api/services/public/pedido.php?action=createDetail`, {
+                const response = await fetch(`${ip}/services/public/pedido.php?action=createDetail`, {
                     method: 'POST',
                     body: formData
                 });
@@ -48,7 +48,6 @@ const ModalCompra = ({ visible, cerrarModal, nombreProductoModal, idProductoModa
         >
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                    <Text style={styles.modalText}>{nombreProductoModal}</Text>
                     <Text style={styles.modalText}>Cantidad:</Text>
                     <TextInput
                         style={styles.input}
@@ -106,12 +105,11 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         padding: 10,
-        marginBottom: 20,
         width: 200,
         textAlign: 'center',
     },
     button: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#458CC6',
         borderRadius: 5,
         paddingVertical: 10,
         paddingHorizontal: 20,

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
-import Buttons from '../Buttons/Button';
-import * as Constantes from '../../utils/constantes';
+import * as Constantes from '../../../utils/constantes';
 
-const ModalEditarCantidad = ({setModalVisible, modalVisible, idDetalle, setCantidadProductoCarrito, cantidadProductoCarrito, getDetalleCarrito}) => {
+const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, setCantidadProductoCarrito, cantidadProductoCarrito, getDetalleCarrito }) => {
 
   const ip = Constantes.IP;
 
@@ -11,24 +10,24 @@ const ModalEditarCantidad = ({setModalVisible, modalVisible, idDetalle, setCanti
     try {
       if (cantidadProductoCarrito <= 0) {
         Alert.alert("La cantidad no puede ser igual o menor a 0");
-        return; // Corrige la lógica aquí
+        return;
       }
 
       const formData = new FormData();
       formData.append('idDetalle', idDetalle);
       formData.append('cantidadProducto', cantidadProductoCarrito);
 
-      const response = await fetch(`${ip}/coffeeshop/api/services/public/pedido.php?action=updateDetail`, {
+      const response = await fetch(`${ip}/services/public/pedido.php?action=updateDetail`, {
         method: 'POST',
         body: formData
       });
 
       const data = await response.json();
       if (data.status) {
-        Alert.alert('Se actualizo el detalle del producto');
+        Alert.alert('Se actualizó el detalle del producto');
         getDetalleCarrito();
       } else {
-        Alert.alert('Error al editar detalle carrito', data.error);
+        Alert.alert('Error al editar detalle del carrito', data.error);
       }
       setModalVisible(false);
     } catch (error) {
@@ -52,23 +51,21 @@ const ModalEditarCantidad = ({setModalVisible, modalVisible, idDetalle, setCanti
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-        <Text style={styles.modalText}>Cantidad actual: {cantidadProductoCarrito}</Text>
+          <Text style={styles.modalText}>Cantidad actual: {cantidadProductoCarrito}</Text>
           <Text style={styles.modalText}>Nueva cantidad:</Text>
           <TextInput
             style={styles.input}
-            value={cantidadProductoCarrito}
+            value={cantidadProductoCarrito.toString()}
             onChangeText={setCantidadProductoCarrito}
             keyboardType="numeric"
             placeholder="Ingrese la cantidad"
           />
-          <Buttons
-            textoBoton='Editar cantidad'
-            accionBoton={handleUpdateDetalleCarrito}
-          />
-          <Buttons
-            textoBoton='Cancelar'
-            accionBoton={handleCancelEditarCarrito}
-          />
+          <TouchableOpacity style={styles.button} onPress={handleUpdateDetalleCarrito}>
+            <Text style={styles.buttonText}>Editar cantidad</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleCancelEditarCarrito}>
+            <Text style={styles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -112,11 +109,12 @@ const styles = StyleSheet.create({
     width: 200,
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#458CC6',
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#ffffff',

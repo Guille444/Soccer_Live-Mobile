@@ -123,6 +123,7 @@ export default function Login({ navigation }) {
                     style={styles.input}
                     placeholder="Correo electrónico"
                     placeholderTextColor="#fff"
+                    keyboardType="email-address"
                 />
                 <TextInput
                     value={contrasenia}
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     alertConfirmButton: {
-        paddingHorizontal: 20,  
+        paddingHorizontal: 20,
         paddingVertical: 10,
     },
     alertConfirmButtonText: {

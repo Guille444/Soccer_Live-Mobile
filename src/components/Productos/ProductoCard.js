@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   card: {
-    backgroundColor: '#06416',
+    backgroundColor: '#ddd',
     borderRadius: 15,
     padding: 16,
     marginTop: 10,
