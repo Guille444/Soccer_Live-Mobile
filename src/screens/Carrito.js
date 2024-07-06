@@ -7,7 +7,7 @@ import ModalEditarCantidad from '../components/Modales/ModalEditarCantidad';
 import { FontAwesome } from '@expo/vector-icons'; // Importar FontAwesome desde expo
 import AwesomeAlert from 'react-native-awesome-alerts';
 
-//Configuracion del encabezado
+//Configuracion del encabezado de la navegacion
 const Carrito = ({ navigation }) => {
     useEffect(() => {
         navigation.setOptions({
@@ -21,6 +21,7 @@ const Carrito = ({ navigation }) => {
         });
     }, [navigation]);
 
+     // Definición de estados
     const ip = Constantes.IP;
     const [dataDetalleCarrito, setDataDetalleCarrito] = useState([]);
     const [idDetalle, setIdDetalle] = useState(null);
@@ -52,7 +53,7 @@ const Carrito = ({ navigation }) => {
         }
     }, [ip]);
 
-    //Actualizar los detalles del carrito
+     // UseEffect para actualizar los detalles del carrito al enfocarse en la pantalla
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getDetalleCarrito();
@@ -82,6 +83,7 @@ const Carrito = ({ navigation }) => {
         }
     };
 
+    // Función para manejar la edición de detalles del carrito
     const handleEditarDetalle = (idDetalle, cantidadDetalle) => {
         setModalVisible(true);
         setIdDetalle(idDetalle);
