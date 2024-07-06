@@ -1,18 +1,22 @@
+//Importaciones
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
+//Componente principal
 export default function Login({ navigation }) {
     const ip = Constantes.IP;
 
-    const [isContra, setIsContra] = useState(true);
-    const [usuario, setUsuario] = useState('');
-    const [contrasenia, setContrasenia] = useState('');
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [showProgress, setShowProgress] = useState(false);
+    //Estados 
+    const [isContra, setIsContra] = useState(true);  // Estado para mostrar/ocultar la contraseña
+    const [usuario, setUsuario] = useState(''); // Estado para el campo del usuario
+    const [contrasenia, setContrasenia] = useState(''); // Estado para el campo de la contraseña
+    const [showAlert, setShowAlert] = useState(false); // Estado para mostrar/ocultar la alerta
+    const [alertMessage, setAlertMessage] = useState(''); // Estado para el mensaje de la alerta
+    const [showProgress, setShowProgress] = useState(false); // Estado para mostrar/ocultar el indicador de progreso
 
+     // Función para validar si hay una sesión activa
     const validarSesion = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
@@ -22,17 +26,18 @@ export default function Login({ navigation }) {
             const data = await response.json();
 
             if (data.status === 1) {
-                cerrarSesion();
+                cerrarSesion(); // Cierra la sesión si hay una activa
                 console.log("Se eliminó la sesión");
             } else {
                 console.log("No hay sesión activa");
             }
         } catch (error) {
             console.error(error);
-            showAlertWithMessage('Ocurrió un error al validar la sesión');
+            showAlertWithMessage('Ocurrió un error al validar la sesión'); // Muestra un mensaje de error
         }
     };
 
+    // Función para cerrar la sesión activa
     const cerrarSesion = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=logOut`, {
@@ -48,23 +53,25 @@ export default function Login({ navigation }) {
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            showAlertWithMessage('Ocurrió un error al cerrar sesión');
+            showAlertWithMessage('Ocurrió un error al cerrar sesión'); // Muestra un mensaje de error
         }
     };
 
+    // Función para mostrar una alerta con un mensaje específico
     const showAlertWithMessage = (message, showProgressIndicator = false) => {
         setAlertMessage(message);
         setShowProgress(showProgressIndicator);
         setShowAlert(true);
     };
 
+    // Función para manejar el proceso de inicio de sesión
     const handlerLogin = async () => {
         if (!usuario.trim() || !contrasenia.trim()) {
-            showAlertWithMessage('Por favor completa todos los campos');
+            showAlertWithMessage('Por favor completa todos los campos'); // Verifica que los campos no estén vacíos
             return;
         }
 
-        showAlertWithMessage('Iniciando sesión...', true);
+        showAlertWithMessage('Iniciando sesión...', true); // Muestra un mensaje de progreso
 
         try {
             const formData = new FormData();
@@ -81,27 +88,29 @@ export default function Login({ navigation }) {
             if (data.status) {
                 setContrasenia('');
                 setUsuario('');
-                showAlertWithMessage('¡Bienvenido!');
+                showAlertWithMessage('¡Bienvenido!'); // Muestra un mensaje de bienvenida
                 setTimeout(() => {
-                    navigation.navigate('TabNavigator');
+                    navigation.navigate('TabNavigator'); // Navega a la siguiente pantalla
                     setShowAlert(false);
                 }, 2000);
             } else {
                 console.log(data);
-                showAlertWithMessage(data.error);
+                showAlertWithMessage(data.error); // Muestra un mensaje de error
             }
         } catch (error) {
             console.error(error, "Error desde Catch");
-            showAlertWithMessage('Ocurrió un error al iniciar sesión');
+            showAlertWithMessage('Ocurrió un error al iniciar sesión');  // Muestra un mensaje de error
         } finally {
-            setShowProgress(false);
+            setShowProgress(false); // Oculta el indicador de progreso
         }
     };
 
+     // Función para navegar a la pantalla de registro
     const irRegistrar = async () => {
         navigation.navigate('Registro');
     };
 
+    // Efecto para validar la sesión al montar el componente
     useEffect(() => {
         validarSesion();
     }, []);
