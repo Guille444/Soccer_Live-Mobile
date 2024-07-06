@@ -1,3 +1,4 @@
+//Importaciones
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
 import * as Constantes from '../../utils/constantes';
@@ -6,6 +7,7 @@ import ModalEditarCantidad from '../components/Modales/ModalEditarCantidad';
 import { FontAwesome } from '@expo/vector-icons'; // Importar FontAwesome desde expo
 import AwesomeAlert from 'react-native-awesome-alerts';
 
+//Configuracion del encabezado
 const Carrito = ({ navigation }) => {
     useEffect(() => {
         navigation.setOptions({
@@ -28,6 +30,7 @@ const Carrito = ({ navigation }) => {
     const [alertMessage, setAlertMessage] = useState('');
     const [showProgress, setShowProgress] = useState(false);
 
+    //Funcion para optener los detalles del carrito
     const getDetalleCarrito = useCallback(async () => {
         try {
             const response = await fetch(`${ip}/services/public/pedido.php?action=readDetail`, {
@@ -49,6 +52,7 @@ const Carrito = ({ navigation }) => {
         }
     }, [ip]);
 
+    //Actualizar los detalles del carrito
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getDetalleCarrito();
@@ -56,6 +60,7 @@ const Carrito = ({ navigation }) => {
         return unsubscribe;
     }, [navigation, getDetalleCarrito]);
 
+    //Fumncion para finalizar el pedido
     const finalizarPedido = async () => {
         try {
             const response = await fetch(`${ip}/services/public/pedido.php?action=finishOrder`, {
@@ -83,6 +88,7 @@ const Carrito = ({ navigation }) => {
         setCantidadProductoCarrito(cantidadDetalle);
     };
 
+    //render de elementos del carrito
     const renderItem = ({ item }) => (
         <CarritoCard
             item={item}
@@ -98,12 +104,14 @@ const Carrito = ({ navigation }) => {
         />
     );
 
+    //Funcion para alerta
     const showAlertWithMessage = (message, showProgressIndicator = false) => {
         setAlertMessage(message);
         setShowProgress(showProgressIndicator);
         setShowAlert(true);
     };
 
+    //Componente principal
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
