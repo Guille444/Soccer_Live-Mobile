@@ -1,3 +1,4 @@
+// Importación de React y otros módulos necesarios para la aplicación.
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, Alert, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import * as Constantes from '../../utils/constantes';
@@ -8,8 +9,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
 export default function Productos({ navigation }) {
-
-    const ip = Constantes.IP;
+    const ip = Constantes.IP;// Obtención de la IP desde las constantes.
     const [dataProductos, setDataProductos] = useState([]);
     const [dataCategorias, setDataCategorias] = useState([]);
     const [selectedValue, setSelectedValue] = useState(null);
@@ -20,6 +20,7 @@ export default function Productos({ navigation }) {
     const [showAlert, setShowAlert] = useState(false);
     const [alertConfig, setAlertConfig] = useState({});
 
+    // useEffect para configurar la barra de navegación y cargar productos y categorías.
     useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Productos',
@@ -30,10 +31,10 @@ export default function Productos({ navigation }) {
             },
             headerTintColor: '#fff',
         });
-        getProductos();
-        getCategorias();
+        getProductos(); // Carga inicial de productos.
+        getCategorias(); // Carga de categorías.
     }, []);
-
+    // Función para manejar la compra de un producto.
     const handleCompra = (nombre, id) => {
         setModalVisible(true);
         setIdProductoModal(id);
@@ -42,9 +43,9 @@ export default function Productos({ navigation }) {
 
     const getProductos = async (idCategoriaSelect = 1) => {
         try {
-            if (idCategoriaSelect <= 0) return;
+            if (idCategoriaSelect <= 0) return; // Validación de categoría seleccionada.
             const formData = new FormData();
-            formData.append('idCategoria', idCategoriaSelect);
+            formData.append('idCategoria', idCategoriaSelect); // Se envía la categoría seleccionada.
             const response = await fetch(`${ip}/services/public/producto.php?action=readProductosCategoria`, {
                 method: 'POST',
                 body: formData,
@@ -61,7 +62,7 @@ export default function Productos({ navigation }) {
                     confirmButtonColor: '#DD6B55',
                     onConfirmPressed: () => setShowAlert(false)
                 });
-                setShowAlert(true);
+                setShowAlert(true);  // Mostrar alerta en caso de error.
             }
         } catch (error) {
             setAlertConfig({
@@ -72,10 +73,11 @@ export default function Productos({ navigation }) {
                 confirmButtonColor: '#DD6B55',
                 onConfirmPressed: () => setShowAlert(false)
             });
-            setShowAlert(true);
+            setShowAlert(true); // Mostrar alerta en caso de error de red.
         }
     };
 
+    // Función asíncrona para obtener las categorías.
     const getCategorias = async () => {
         try {
             const response = await fetch(`${ip}/services/public/categoria.php?action=readAll`, {
@@ -83,7 +85,7 @@ export default function Productos({ navigation }) {
             });
             const data = await response.json();
             if (data.status) {
-                setDataCategorias(data.dataset);
+                setDataCategorias(data.dataset);  // Se actualiza la lista de categorías.
             } else {
                 setAlertConfig({
                     title: 'Error categorias',
@@ -108,10 +110,12 @@ export default function Productos({ navigation }) {
         }
     };
 
+    // Función para navegar al carrito de compras.
     const irCarrito = () => {
         navigation.navigate('Carrito');
     };
 
+    // Renderizado de la interfaz de usuario.
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <View style={styles.container}>
@@ -175,6 +179,8 @@ export default function Productos({ navigation }) {
     );
 }
 
+
+// Estilos para el componente
 const styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
