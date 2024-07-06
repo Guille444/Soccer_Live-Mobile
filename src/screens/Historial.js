@@ -1,8 +1,11 @@
+//Importaciones
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 
+//Componente Home
 export default function Home({ navigation }) {
 
+    //Configuracion del encabezado Historial
     useEffect(() => {
         // Configurar opciones de navegación
         navigation.setOptions({
@@ -17,6 +20,7 @@ export default function Home({ navigation }) {
     }, []);
 
 
+    //Renderizado del componente
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <View style={styles.container}>
