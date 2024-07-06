@@ -12,7 +12,7 @@ export default function Home({ navigation }) {
     const [alertTitle, setAlertTitle] = useState('');
     const ip = Constantes.IP;
 
-    //Obtener el nombre dek usuario
+    //Funcion para obtener el nombre del usuario
     const getUser = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
@@ -46,11 +46,12 @@ export default function Home({ navigation }) {
         }
     };
 
-        //Configuracion del encabezado 
+         // UseEffect para obtener el nombre del usuario al montar el componente
     useEffect(() => {
         getUser();
     }, []);
 
+    // UseEffect para configurar el encabezado de la navegación
     useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Inicio',
@@ -63,7 +64,7 @@ export default function Home({ navigation }) {
         });
     }, []);
 
-    //Muestra de la intefaz
+    // Renderizado del componente
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <View style={styles.container}>
@@ -96,6 +97,8 @@ export default function Home({ navigation }) {
     );
 }
 
+
+// Estilos para el componente
 const styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
