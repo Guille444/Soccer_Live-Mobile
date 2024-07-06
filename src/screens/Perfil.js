@@ -4,27 +4,31 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
 export default function Perfil({ navigation }) {
+    // Obtener la IP de las constantes
     const ip = Constantes.IP;
 
     useEffect(() => {
         // Configurar opciones de navegación
         navigation.setOptions({
-            headerTitle: 'Perfil',
-            headerTitleAlign: 'center',
-            headerTransparent: true,
+            headerTitle: 'Perfil', // Título de la pantalla
+            headerTitleAlign: 'center', // Centrar el título
+            headerTransparent: true, // Hacer el header transparente
             headerStyle: {
-                backgroundColor: 'transparent',
+                backgroundColor: 'transparent', // Fondo transparente
             },
-            headerTintColor: '#fff',
+            headerTintColor: '#fff', // Color del texto
             headerRight: () => (
+                // Botón de cierre de sesión en la esquina superior derecha
                 <TouchableOpacity onPress={handleLogout}>
                     <Image source={require('../img/logout.png')} style={styles.logoutImage} />
                 </TouchableOpacity>
             ),
         });
     }, []);
-
+    // Estado para manejar la actualización de datos
     const [refreshing, setRefreshing] = useState(false);
+
+    // Estado para almacenar los datos del perfil del usuario
     const [profileData, setProfileData] = useState({
         nombre_cliente: '',
         apellido_cliente: '',
@@ -32,19 +36,20 @@ export default function Perfil({ navigation }) {
         telefono_cliente: '',
         correo_cliente: ''
     });
-
+    // Estado para manejar la visibilidad y el mensaje de la alerta
     const [alertVisible, setAlertVisible] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertType, setAlertType] = useState('success');
 
+    // Función para obtener los datos del perfil desde el servidor
     const fetchProfileData = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=readProfile`, {
-                method: 'POST'
+                method: 'POST' // Método POST para la solicitud
             });
-            const data = await response.json();
+            const data = await response.json(); // Convertir la respuesta a JSON
             if (data.status) {
-                setProfileData(data.dataset);
+                setProfileData(data.dataset); // Actualizar el estado con los datos del perfil
             } else {
                 showAlert('Error', 'Failed to fetch profile data', 'error');
             }
@@ -54,17 +59,18 @@ export default function Perfil({ navigation }) {
         }
     };
 
+    // Función para manejar el cierre de sesión del usuario
     const handleLogout = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=logOut`, {
                 method: 'GET'
             });
-            const data = await response.json();
+            const data = await response.json(); // Convertir la respuesta a JSON
             if (data.status) {
                 showAlert('Éxito', "Has cerrado sesión exitosamente.", 'success');
                 setTimeout(() => {
-                    setAlertVisible(false);
-                    navigation.navigate('Login');
+                    setAlertVisible(false);  // Ocultar la alerta después de un tiempo
+                    navigation.navigate('Login'); // Navegar a la pantalla de inicio de sesión
                 }, 2000);
             } else {
                 showAlert('Error', "Error al cerrar sesión.", 'error');
@@ -74,6 +80,7 @@ export default function Perfil({ navigation }) {
         }
     };
 
+    // Función para editar los datos del perfil del usuario
     const editProfile = async () => {
         try {
             const formData = new FormData();
@@ -84,8 +91,8 @@ export default function Perfil({ navigation }) {
             formData.append('correoCliente', profileData.correo_cliente);
 
             const response = await fetch(`${ip}/services/public/cliente.php?action=editProfile`, {
-                method: 'POST',
-                body: formData,
+                method: 'POST', // Método POST para la solicitud
+                body: formData, // Cuerpo de la solicitud con los datos del formulario
             });
             const data = await response.json();
             if (data.status) {
@@ -98,17 +105,18 @@ export default function Perfil({ navigation }) {
             showAlert('Error', 'Error al registrar', 'error');
         }
     };
-
+    // Función para mostrar una alerta con un mensaje específico
     const showAlert = (title, message, type) => {
-        setAlertMessage(message);
-        setAlertType(type);
-        setAlertVisible(true);
+        setAlertMessage(message); // Establecer el mensaje de la alerta
+        setAlertType(type); // Establecer el tipo de alerta
+        setAlertVisible(true); // Mostrar la alerta
     };
 
     useEffect(() => {
+        // Obtener los datos del perfil al cargar la pantalla
         fetchProfileData();
     }, []);
-
+    // Función para refrescar los datos del perfil
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchProfileData().then(() => setRefreshing(false));
