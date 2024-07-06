@@ -1,8 +1,10 @@
+//Importaciones
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
+//Funcion principal
 export default function Home({ navigation }) {
     const [nombre, setNombre] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
@@ -10,6 +12,7 @@ export default function Home({ navigation }) {
     const [alertTitle, setAlertTitle] = useState('');
     const ip = Constantes.IP;
 
+    //Obtener el nombre dek usuario
     const getUser = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
@@ -43,6 +46,7 @@ export default function Home({ navigation }) {
         }
     };
 
+        //Configuracion del encabezado 
     useEffect(() => {
         getUser();
     }, []);
@@ -59,6 +63,7 @@ export default function Home({ navigation }) {
         });
     }, []);
 
+    //Muestra de la intefaz
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <View style={styles.container}>
