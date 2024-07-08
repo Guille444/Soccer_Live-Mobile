@@ -11,6 +11,9 @@ export default function ProductoCard({ ip, imagenProducto, idProducto, nombrePro
   , precioProducto, existenciasProducto, accionBotonProducto
 }) {
 
+
+  console.log('Valor imagen', imagenProducto)
+
   return (
 
     <View style={styles.card}>

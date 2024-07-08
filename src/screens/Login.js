@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
+import { useFocusEffect } from '@react-navigation/native';
 
 //Componente principal
 export default function Login({ navigation }) {
@@ -16,7 +17,17 @@ export default function Login({ navigation }) {
     const [alertMessage, setAlertMessage] = useState(''); // Estado para el mensaje de la alerta
     const [showProgress, setShowProgress] = useState(false); // Estado para mostrar/ocultar el indicador de progreso
 
-     // Función para validar si hay una sesión activa
+
+    // Efecto para cargar los detalles del carrito al cargar la pantalla o al enfocarse en ella
+    useFocusEffect(
+        // La función useFocusEffect ejecuta un efecto cada vez que la pantalla se enfoca.
+        React.useCallback(() => {
+            validarSesion(); // Llama a la función getDetalleCarrito.
+        }, [])
+    );
+
+
+    // Función para validar si hay una sesión activa
     const validarSesion = async () => {
         try {
             const response = await fetch(`${ip}/services/public/cliente.php?action=getUser`, {
@@ -26,8 +37,7 @@ export default function Login({ navigation }) {
             const data = await response.json();
 
             if (data.status === 1) {
-                cerrarSesion(); // Cierra la sesión si hay una activa
-                console.log("Se eliminó la sesión");
+                navigation.navigate('TabNavigator'); // Navega a la siguiente pantalla
             } else {
                 console.log("No hay sesión activa");
             }
@@ -105,7 +115,7 @@ export default function Login({ navigation }) {
         }
     };
 
-     // Función para navegar a la pantalla de registro
+    // Función para navegar a la pantalla de registro
     const irRegistrar = async () => {
         navigation.navigate('Registro');
     };

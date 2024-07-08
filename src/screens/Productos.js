@@ -52,6 +52,7 @@ export default function Productos({ navigation }) {
             });
             const data = await response.json();
             if (data.status) {
+                console.log(data.dataset)
                 setDataProductos(data.dataset);
             } else {
                 setAlertConfig({
