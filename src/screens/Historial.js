@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, FlatList, SafeAreaView } from 'react-native';
+import StarRatingWidget from 'react-native-star-rating-widget';
+import AwesomeAlert from 'react-native-awesome-alerts'; // Importa AwesomeAlert
 import * as Constantes from '../../utils/constantes';
 
 export default function Historial({ navigation }) {
     const [historial, setHistorial] = useState([]);
     const [comentarios, setComentarios] = useState({});
+    const [rating, setRating] = useState({});
+    const [submittedComments, setSubmittedComments] = useState({});
+    const [isAlertVisible, setIsAlertVisible] = useState(false); // Renombrado
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertTitle, setAlertTitle] = useState('');
     const ip = Constantes.IP;
 
     useEffect(() => {
-        // Configuración del encabezado
         navigation.setOptions({
             headerTitle: 'Historial',
             headerTitleAlign: 'center',
             headerStyle: {
-                backgroundColor: '#0A305E', // Color de fondo sólido para el encabezado
-                elevation: 0, // Para Android, quita la sombra del encabezado
-                shadowOpacity: 0, // Para iOS, quita la sombra del encabezado
+                backgroundColor: '#0A305E',
+                elevation: 0,
+                shadowOpacity: 0,
             },
             headerTintColor: '#fff',
         });
 
-        // Llamada a la función para obtener el historial de pedidos
         fetchHistorialPedidos();
     }, []);
 
     const fetchHistorialPedidos = async () => {
         try {
             const formData = new FormData();
-            formData.append('valor', '%%'); // Puedes cambiar esto si necesitas un criterio específico
+            formData.append('valor', '%%');
 
             const response = await fetch(`${ip}/services/public/detalle_pedido.php?action=searchHistorial`, {
                 method: 'POST',
@@ -39,10 +44,10 @@ export default function Historial({ navigation }) {
             if (result.status === 1) {
                 setHistorial(result.dataset);
             } else {
-                console.error('Error al obtener el historial:', result.error);
+                showAlert('Error', 'Error al obtener el historial: ' + result.error);
             }
         } catch (error) {
-            console.error('Error en la solicitud:', error);
+            showAlert('Error', 'Error en la solicitud: ' + error.message);
         }
     };
 
@@ -53,12 +58,27 @@ export default function Historial({ navigation }) {
         }));
     };
 
-    const handleSubmitComment = async (id) => {
+    const handleRatingChange = (id, rating) => {
+        setRating(prevRating => ({
+            ...prevRating,
+            [id]: rating
+        }));
+    };
+
+    const validateAndSubmitComment = async (id) => {
+        const comentario = comentarios[id] || '';
+        const ratingValue = rating[id] || 0;
+
+        if (!comentario.trim() || ratingValue <= 0) {
+            showAlert('Error', 'Por favor, completa todos los campos antes de enviar.');
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append('idDetalle', id);
-            formData.append('contenidoComentario', comentarios[id]);
-            formData.append('starValue', '5'); // Puedes cambiar esto si necesitas una puntuación específica
+            formData.append('contenidoComentario', comentario);
+            formData.append('starValue', ratingValue.toString());
 
             const response = await fetch(`${ip}/services/public/comentario.php?action=createRow`, {
                 method: 'POST',
@@ -68,13 +88,23 @@ export default function Historial({ navigation }) {
             const result = await response.json();
 
             if (result.status === 1) {
-                alert('Comentario enviado correctamente');
+                showAlert('Éxito', 'Comentario enviado correctamente');
+                setSubmittedComments(prev => ({
+                    ...prev,
+                    [id]: true
+                }));
             } else {
-                console.error('Error al enviar el comentario:', result.error);
+                showAlert('Error', 'Error al enviar el comentario: ' + result.error);
             }
         } catch (error) {
-            console.error('Error en la solicitud:', error);
+            showAlert('Error', 'Error en la solicitud: ' + error.message);
         }
+    };
+
+    const showAlert = (title, message) => {
+        setAlertTitle(title);
+        setAlertMessage(message);
+        setIsAlertVisible(true); // Actualizado
     };
 
     const renderItem = ({ item }) => (
@@ -83,15 +113,25 @@ export default function Historial({ navigation }) {
             <Text style={styles.itemText}>Descripción: {item.descripcion_producto}</Text>
             <Text style={styles.itemText}>Cantidad: {item.cantidad_producto}</Text>
             <Text style={styles.itemText}>Fecha: {item.fecha_registro}</Text>
+            <StarRatingWidget
+                rating={rating[item.id_detalle] || 0}
+                onChange={(rating) => handleRatingChange(item.id_detalle, rating)}
+                starSize={20}
+                fullStarColor="#FFD700"
+                containerStyle={styles.starContainer}
+                disabled={submittedComments[item.id_detalle] || false}
+            />
             <TextInput
                 style={styles.input}
                 placeholder="Escribe tu comentario aquí..."
                 value={comentarios[item.id_detalle] || ''}
                 onChangeText={(text) => handleCommentChange(item.id_detalle, text)}
+                editable={!submittedComments[item.id_detalle]}
             />
             <Button
                 title="Enviar Comentario"
-                onPress={() => handleSubmitComment(item.id_detalle)}
+                onPress={() => validateAndSubmitComment(item.id_detalle)}
+                disabled={submittedComments[item.id_detalle]}
             />
         </View>
     );
@@ -104,13 +144,27 @@ export default function Historial({ navigation }) {
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id_detalle.toString()}
                     contentContainerStyle={styles.listContainer}
-                    style={styles.list} // Añadir estilo para asegurar que FlatList se ajuste
+                    style={styles.list}
                 />
                 {historial.length === 0 && (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.welcomeText}>No hay historial disponible</Text>
                     </View>
                 )}
+                <AwesomeAlert
+                    show={isAlertVisible} // Actualizado
+                    title={alertTitle}
+                    message={alertMessage}
+                    showConfirmButton={true}
+                    confirmText="OK"
+                    confirmButtonColor="gray"
+                    onConfirmPressed={() => setIsAlertVisible(false)} // Actualizado
+                    contentContainerStyle={styles.alertContentContainer}
+                    titleStyle={styles.alertTitle}
+                    messageStyle={styles.alertMessage}
+                    confirmButtonStyle={styles.alertConfirmButton}
+                    confirmButtonTextStyle={styles.alertConfirmButtonText}
+                />
             </ImageBackground>
         </SafeAreaView>
     );
@@ -124,11 +178,10 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         height: '100%',
-        resizeMode: 'cover',
         backgroundColor: '#0A305E',
     },
     list: {
-        marginTop: 10, // Ajusta este valor según la altura del encabezado
+        marginTop: 25,
     },
     listContainer: {
         padding: 20,
@@ -142,7 +195,7 @@ const styles = StyleSheet.create({
     itemContainer: {
         marginVertical: 10,
         padding: 10,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro para resaltar el texto
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         borderRadius: 5,
         width: '100%',
     },
@@ -162,9 +215,32 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
         width: '100%',
     },
+    starContainer: {
+        marginVertical: 10,
+    },
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    alertContentContainer: {
+        borderRadius: 10,
+        padding: 20,
+    },
+    alertTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    alertMessage: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    alertConfirmButton: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    alertConfirmButtonText: {
+        fontSize: 16,
     },
 });
