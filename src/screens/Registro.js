@@ -102,28 +102,28 @@ export default function Registro({ navigation }) {
                     onChangeText={setNombre}
                     style={styles.input}
                     placeholder="Nombre"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                 />
                 <TextInput
                     value={apellido}
                     onChangeText={setApellido}
                     style={styles.input}
                     placeholder="Apellido"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                 />
                 <TextInput
                     value={direccion}
                     onChangeText={setDireccion}
                     style={styles.input}
                     placeholder="Dirección"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                 />
                 <TextInput
                     value={telefono}
                     onChangeText={handleTextChange}
                     style={styles.input}
                     placeholder="Teléfono"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     keyboardType="phone-pad"
                 />
                 <TextInput
@@ -131,7 +131,7 @@ export default function Registro({ navigation }) {
                     onChangeText={setEmail}
                     style={styles.input}
                     placeholder="Correo electrónico"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     keyboardType="email-address"
                 />
                 <TextInput
@@ -139,7 +139,7 @@ export default function Registro({ navigation }) {
                     onChangeText={setClave}
                     style={styles.input}
                     placeholder="Contraseña"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     secureTextEntry={true}
                 />
                 <TextInput
@@ -147,7 +147,7 @@ export default function Registro({ navigation }) {
                     onChangeText={setConfirmarClave}
                     style={styles.input}
                     placeholder="Confirmar contraseña"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     secureTextEntry={true}
                 />
                 <TouchableOpacity onPress={handleCreate} style={styles.button}>
@@ -210,17 +210,20 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 50,
+        padding: 8,
         borderColor: '#fff',
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: '#0A305E', // Fondo claro para los campos de entrada
+        height: 50,
         borderWidth: 1,
-        borderRadius: 5,
-        paddingLeft: 10,
-        marginBottom: 12,
+        paddingHorizontal: 10,
+        marginBottom: 20,
         fontSize: 16,
         color: '#fff',
     },
     button: {
-        width: '50%',
+        width: '100%',
         height: 50,
         backgroundColor: '#fff',
         alignItems: 'center',

@@ -16,6 +16,7 @@ class ClienteHandler
     protected $telefono = null;
     protected $correo = null;
     protected $clave = null;
+    protected $pin = null;
     protected $estado = null;
 
     /*
@@ -180,5 +181,67 @@ class ClienteHandler
             WHERE correo_cliente = ?';
         $params = array($correo);
         return Database::getRow($sql, $params);
+    }
+
+    //Recuperacion de contraseña 
+
+    public function verifUs()
+    {
+        $sql = 'SELECT * FROM clientes 
+                WHERE correo_cliente = ?';
+        $params = array($this->correo);
+        return Database::getRow($sql, $params);
+    }
+
+
+    public function verifPin()
+    {
+        $sql = 'SELECT * FROM clientes 
+                WHERE codigo_recuperacion = ? AND id_cliente = ?';
+        $params = array($this->pin, $_SESSION['clienteRecup']);
+        return Database::getRow($sql, $params);
+    }
+
+    // Guardar el PIN en la base de datos
+    public function guardarCodigoRecuperacion($codigo)
+    {
+        error_log('Correo en guardarCodigoRecuperacion: ' . $this->correo); // Registro de depuración
+        error_log('Código en guardarCodigoRecuperacion: ' . $codigo); // Registro de depuración
+
+        $sql = 'UPDATE clientes 
+            SET codigo_recuperacion = ? 
+            WHERE correo_cliente = ?';
+        $params = array($codigo, $this->correo);
+        return Database::executeRow($sql, $params);
+    }
+
+    // Verificar el PIN en la base de datos
+    public function verificarCodigoRecuperacion($codigo)
+    {
+        $sql = 'SELECT id_cliente 
+            FROM clientes 
+            WHERE id_cliente = ? 
+            AND codigo_recuperacion = ?';
+        $params = array($_SESSION['clienteRecup'], $codigo);
+
+        // Agregar logs para depurar
+        error_log("SQL: " . $sql);
+        error_log("Params: " . print_r($params, true));
+
+        $result = Database::getRow($sql, $params);
+
+        // Log del resultado
+        error_log("Resultado: " . print_r($result, true));
+
+        return $result !== false;
+    }
+
+    public function changePasswordRecu()
+    {
+        $sql = 'UPDATE clientes
+                SET clave_cliente = ?
+                WHERE id_cliente = ?';
+        $params = array($this->clave, $this->id);
+        return Database::executeRow($sql, $params);
     }
 }

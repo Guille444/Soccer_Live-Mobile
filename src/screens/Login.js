@@ -120,10 +120,24 @@ export default function Login({ navigation }) {
         navigation.navigate('Registro');
     };
 
+    // Función para navegar hacia la pantalla de recuperación de contraseña
+    const Recuperar = async () => {
+        navigation.navigate('EnviarCorreo');
+    };
+
+
     // Efecto para validar la sesión al montar el componente
     useEffect(() => {
         validarSesion();
     }, []);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // Restablecer los estados de usuario y contrasenia cuando la pantalla se enfoca
+            setUsuario('');
+            setContrasenia('');
+        }, [])
+    );
 
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
@@ -135,13 +149,15 @@ export default function Login({ navigation }) {
                         resizeMode='contain'
                     />
                 </View>
-                <Text style={styles.welcomeText}>Bienvenido</Text>
+                <TouchableOpacity>
+                    <Text style={styles.welcomeText} onPress={cerrarSesion}>Bienvenido</Text>
+                </TouchableOpacity>
                 <TextInput
                     value={usuario}
                     onChangeText={setUsuario}
                     style={styles.input}
                     placeholder="Correo electrónico"
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     keyboardType="email-address"
                 />
                 <TextInput
@@ -150,10 +166,10 @@ export default function Login({ navigation }) {
                     style={styles.input}
                     placeholder="Contraseña"
                     secureTextEntry={true}
-                    placeholderTextColor="#fff"
+                    placeholderTextColor="#ddd"
                     contra={isContra}
                 />
-                <TouchableOpacity>
+                <TouchableOpacity onPress={Recuperar}>
                     <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={irRegistrar}>
@@ -208,13 +224,16 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 50,
+        padding: 8,
         borderColor: '#fff',
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: '#0A305E', // Fondo claro para los campos de entrada
+        height: 50,
         borderWidth: 1,
-        borderRadius: 5,
         paddingHorizontal: 10,
         marginBottom: 20,
-        fontSize: 18,
+        fontSize: 16,
         color: '#fff',
     },
     forgotPasswordText: {
@@ -232,7 +251,7 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline'
     },
     loginButton: {
-        width: '50%',
+        width: '100%',
         height: 50,
         backgroundColor: '#fff',
         alignItems: 'center',

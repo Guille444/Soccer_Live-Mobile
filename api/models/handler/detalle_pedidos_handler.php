@@ -49,7 +49,6 @@ class DetallePedidoHandler
     public function searchHistorial()
     {
         $this->search = $this->search === '' ? '%%' : '%' . $this->search . '%';
-
         $sql = 'SELECT id_detalle,id_pedido,descripcion_producto,nombre_marca,
         cantidad_producto,fecha_registro,imagen_producto, nombre_producto
         from detalle_pedidos

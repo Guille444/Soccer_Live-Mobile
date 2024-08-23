@@ -9,6 +9,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 
 //Configuracion del encabezado de la navegacion
 const Carrito = ({ navigation }) => {
+    
     useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Carrito',

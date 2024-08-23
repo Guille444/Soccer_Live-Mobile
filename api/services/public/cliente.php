@@ -6,6 +6,9 @@ require_once('../../models/data/clientes_data.php');
 if (isset($_GET['action'])) {
     // Se crea una sesión o se reanuda la actual para poder utilizar variables de sesión en el script.
     session_start();
+    if (!isset($_SESSION['clienteRecup']) || empty($_SESSION['clienteRecup'])) {
+        error_log('ID de cliente en la sesión no está establecido o está vacío');
+    }
     // Se instancia la clase correspondiente.
     $cliente = new ClienteData;
     // Se declara e inicializa un arreglo para guardar el resultado que retorna la API.
@@ -185,6 +188,65 @@ if (isset($_GET['action'])) {
                     $result['message'] = 'Autenticación correcta';
                 } else {
                     $result['error'] = 'La cuenta ha sido desactivada';
+                }
+                break;
+            case 'changePassword':
+                if (!$cliente->setId($_SESSION['clienteRecup'])) {
+                    $result['error'] = 'Acción no disponible';
+                } elseif ($_POST['claveNueva'] != $_POST['confirmarClave']) {
+                    $result['error'] = 'Contraseñas diferentes';
+                } elseif (!$cliente->setClave($_POST['claveNueva'])) {
+                    $result['error'] = $cliente->getDataError();
+                } elseif ($cliente->changePasswordRecu()) {
+                    $result['status'] = 1;
+                    $result['message'] = 'Contraseña modificada correctamente';
+                } else {
+                    $result['error'] = 'Ocurrió un problema al cambiar la contraseña';
+                }
+                break;
+            case 'verifUs':
+                if (!$cliente->setCorreoRecuperacion($_POST['correoCliente'])) {
+                    $result['error'] = $cliente->getDataError();
+                } elseif ($result['dataset'] = $cliente->verifUs()) {
+                    $result['status'] = 1;
+                    $_SESSION['clienteRecup'] = $result['dataset']['id_cliente'];
+                } else {
+                    $result['error'] = 'Correo electrónico inexistente';
+                }
+                break;
+            case 'sendPin':
+                $correoCliente = $_POST['correo_cliente'] ?? '';
+                $codigoRecuperacion = $_POST['codigo_recuperacion'] ?? '';
+
+                if ($correoCliente && $codigoRecuperacion) {
+                    if ($cliente->setCorreo($correoCliente)) {
+                        if ($cliente->guardarCodigoRecuperacion($codigoRecuperacion)) {
+                            $result['status'] = 1;
+                            $result['message'] = 'Correo enviado correctamente';
+                        } else {
+                            $result['error'] = 'Error al guardar el código de recuperación';
+                        }
+                    } else {
+                        $result['error'] = 'Correo inválido';
+                    }
+                } else {
+                    $result['error'] = 'Datos incompletos';
+                }
+                break;
+            case 'verifPin':
+                $correoCliente = $_POST['correo_cliente'] ?? '';
+                $pinCliente = $_POST['codigo_recuperacion'] ?? '';
+
+                if ($correoCliente && $pinCliente) {
+                    $cliente->setCorreo($correoCliente);
+                    if ($cliente->verificarCodigoRecuperacion($pinCliente)) {
+                        $result['status'] = 1;
+                        $result['message'] = 'Codigo de recuperación verificado correctamente';
+                    } else {
+                        $result['error'] = 'Codigo de recuperación incorrecto';
+                    }
+                } else {
+                    $result['error'] = 'Datos incompletos';
                 }
                 break;
             default:

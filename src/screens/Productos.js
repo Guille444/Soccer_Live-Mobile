@@ -7,6 +7,7 @@ import ModalCompra from '../components/Modales/ModalCompra';
 import RNPickerSelect from 'react-native-picker-select';
 import { FontAwesome } from '@expo/vector-icons';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Productos({ navigation }) {
     const ip = Constantes.IP;// Obtención de la IP desde las constantes.
@@ -115,6 +116,13 @@ export default function Productos({ navigation }) {
     const irCarrito = () => {
         navigation.navigate('Carrito');
     };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // Restablecer los estados de usuario y contrasenia cuando la pantalla se enfoca
+            setCantidad('');
+        }, [])
+    );
 
     // Renderizado de la interfaz de usuario.
     return (

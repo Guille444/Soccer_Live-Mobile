@@ -122,6 +122,10 @@ export default function Perfil({ navigation }) {
         fetchProfileData().then(() => setRefreshing(false));
     }, []);
 
+    const irCambiarContraseña = () => {
+        navigation.navigate('Clave');
+    };
+
     return (
         <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
             <ScrollView contentContainerStyle={styles.container}>
@@ -171,7 +175,10 @@ export default function Perfil({ navigation }) {
                     />
                 </View>
                 <TouchableOpacity style={styles.button} onPress={editProfile}>
-                    <Text style={styles.buttonText}>Guardar</Text>
+                    <Text style={styles.buttonText}>GUARDAR</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button2} onPress={irCambiarContraseña}>
+                    <Text style={styles.buttonText2}>CAMBIAR CONTRASEÑA</Text>
                 </TouchableOpacity>
             </ScrollView>
             <AwesomeAlert
@@ -183,7 +190,7 @@ export default function Perfil({ navigation }) {
                 closeOnHardwareBackPress={false}
                 showConfirmButton={true}
                 confirmText="OK"
-                confirmButtonColor={alertType === 'success' ? '#0A305E' : '#DD6B55'}
+                confirmButtonColor={alertType === 'success' ? 'gray' : '#DD6B55'}
                 confirmButtonStyle={styles.alertConfirmButton}
                 confirmButtonTextStyle={styles.alertConfirmButtonText}
                 onConfirmPressed={() => setAlertVisible(false)}
@@ -228,25 +235,43 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 50,
+        padding: 8,
         borderColor: '#fff',
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: '#0A305E', // Fondo claro para los campos de entrada
+        height: 50,
         borderWidth: 1,
-        borderRadius: 5,
-        paddingLeft: 10,
-        marginBottom: 20,
-        fontSize: 18, // Ajuste el tamaño de fuente a 18
+        paddingHorizontal: 10,
+        marginBottom: 15,
+        fontSize: 16,
         color: '#fff',
     },
     button: {
-        width: '50%',
+        width: '100%',
         height: 50,
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
     },
+    button2: {
+        width: '100%',
+        height: 50,
+        backgroundColor: '#458CC6',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        marginTop: 10,
+        color: '#fff'
+    },
     buttonText: {
         color: '#0A305E',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    buttonText2: {
+        color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
     },

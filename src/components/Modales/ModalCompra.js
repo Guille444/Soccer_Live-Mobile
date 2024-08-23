@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import * as Constantes from '../../../utils/constantes';
+import { useFocusEffect } from '@react-navigation/native'; 
 
 const ModalCompra = ({ visible, cerrarModal, nombreProductoModal, idProductoModal, cantidad, setCantidad }) => {
     const ip = Constantes.IP;
@@ -36,6 +37,13 @@ const ModalCompra = ({ visible, cerrarModal, nombreProductoModal, idProductoModa
     const handleCancelCarrito = () => {
         cerrarModal(false);
     };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // Restablecer los estados de usuario y contrasenia cuando la pantalla se enfoca
+            cantidad
+        }, [])
+    );
 
     return (
         <Modal
