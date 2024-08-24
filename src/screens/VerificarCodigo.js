@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Constantes from '../../utils/constantes';
 
@@ -100,48 +100,50 @@ export default function VerificarCodigo({ route, navigation }) {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Verificar Código</Text>
-            <Text style={styles.instructions}>Ingresa el código de verificación enviado a tu correo electrónico</Text>
+        <ImageBackground source={require('../img/fondo.png')} style={styles.backgroundImage}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Text style={styles.title}>Verificar Código</Text>
+                <Text style={styles.instructions}>Ingresa el código de verificación enviado a tu correo electrónico</Text>
 
-            <View style={styles.inputsContainer}>
-                {Array.from({ length: 6 }).map((_, index) => (
-                    <TextInput
-                        key={index}
-                        style={styles.input}
-                        ref={inputRefs[index]}
-                        onChangeText={(text) => onChangeText(text, index)}
-                        onKeyPress={(e) => onKeyPress(e, index)}
-                        value={[number1, number2, number3, number4, number5, number6][index]}
-                        placeholder=""
-                        keyboardType="numeric"
-                        maxLength={1}
-                    />
-                ))}
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handlePin}>
-                <Text style={styles.buttonText}>VERIFICAR</Text>
-            </TouchableOpacity>
+                <View style={styles.inputsContainer}>
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <TextInput
+                            key={index}
+                            style={styles.input}
+                            ref={inputRefs[index]}
+                            onChangeText={(text) => onChangeText(text, index)}
+                            onKeyPress={(e) => onKeyPress(e, index)}
+                            value={[number1, number2, number3, number4, number5, number6][index]}
+                            placeholder=""
+                            keyboardType="numeric"
+                            maxLength={1}
+                        />
+                    ))}
+                </View>
+                <TouchableOpacity style={styles.button} onPress={handlePin}>
+                    <Text style={styles.buttonText}>VERIFICAR</Text>
+                </TouchableOpacity>
 
-            <AwesomeAlert
-                show={showAlert}
-                showProgress={false}
-                title="Alerta"
-                message={alertMessage}
-                closeOnTouchOutside={true}
-                closeOnHardwareBackPress={false}
-                showCancelButton={false}
-                showConfirmButton={true}
-                confirmText="OK"
-                confirmButtonColor="gray"
-                onConfirmPressed={() => setShowAlert(false)}
-                contentContainerStyle={styles.alertContentContainer}
-                titleStyle={styles.alertTitle}
-                messageStyle={styles.alertMessage}
-                confirmButtonTextStyle={styles.alertConfirmButtonText}
-                confirmButtonStyle={styles.alertConfirmButton}
-            />
-        </ScrollView>
+                <AwesomeAlert
+                    show={showAlert}
+                    showProgress={false}
+                    title="Alerta"
+                    message={alertMessage}
+                    closeOnTouchOutside={true}
+                    closeOnHardwareBackPress={false}
+                    showCancelButton={false}
+                    showConfirmButton={true}
+                    confirmText="OK"
+                    confirmButtonColor="gray"
+                    onConfirmPressed={() => setShowAlert(false)}
+                    contentContainerStyle={styles.alertContentContainer}
+                    titleStyle={styles.alertTitle}
+                    messageStyle={styles.alertMessage}
+                    confirmButtonTextStyle={styles.alertConfirmButtonText}
+                    confirmButtonStyle={styles.alertConfirmButton}
+                />
+            </ScrollView>
+        </ImageBackground>
     );
 }
 
@@ -152,15 +154,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
     },
+    backgroundImage: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#0A305E',
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        color: '#fff',
     },
     instructions: {
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 20,
+        color: '#fff',
     },
     inputsContainer: {
         flexDirection: 'row',
@@ -176,15 +186,16 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         textAlign: 'center',
         fontSize: 24,
+        color: '#fff',
     },
     button: {
-        backgroundColor: '#000',
+        backgroundColor: '#fff',
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',
     },
     buttonText: {
-        color: '#fff',
+        color: '#0A305E',
         fontSize: 16,
         fontWeight: 'bold',
     },

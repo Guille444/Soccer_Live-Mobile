@@ -143,3 +143,5 @@ REFERENCES detalle_pedidos (id_detalle)
 DESCRIBE comentarios;
 
 SELECT * FROM clientes;
+SELECT * FROM pedidos;
+SELECT * FROM detalle_pedidos;

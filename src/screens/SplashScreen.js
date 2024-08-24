@@ -3,9 +3,9 @@ import { StyleSheet, View, Image, ImageBackground } from 'react-native';
 
 // Función del componente SplashScreen2
 export default function SplashScreen2() {
-    // useEffect es un hook que se ejecuta después de que el componente ha sido montado
+  // useEffect es un hook que se ejecuta después de que el componente ha sido montado
   useEffect(() => {
-// Aquí puedes agregar lógica que quieras que se ejecute al cargar el componente,
+    // Aquí puedes agregar lógica que quieras que se ejecute al cargar el componente,
     // como navegación a otra pantalla después de un retraso.
   }, []);
 
@@ -26,7 +26,7 @@ export default function SplashScreen2() {
 
 // Estilos para el componente
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flex: 1, // El contenedor ocupa todo el espacio disponible
     justifyContent: 'center', // Centra verticalmente el contenido
     alignItems: 'center', // Centra horizontalmente el contenido

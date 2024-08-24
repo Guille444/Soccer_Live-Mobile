@@ -68,13 +68,13 @@ try {
     $mail->SMTPDebug = 0;
     $mail->Debugoutput = 'html';
 
-    $mail->setFrom("soportesaar@gmail.com");
+    $mail->setFrom("soporte.soccerlive@gmail.com");
     $mail->SMTPAuth = true;
     $mail->SMTPSecure = 'ssl';
     $mail->Host = "smtp.gmail.com";
     $mail->Port = 465;
-    $mail->Username = "soportesaar@gmail.com";
-    $mail->Password = "grmhcnhakxcqfggk";
+    $mail->Username = "soporte.soccerlive@gmail.com";
+    $mail->Password = "vtkkjhhprhgsxnty";
 
     $mail->addAddress($email);
     $mail->Subject = 'Recuperación de contraseña';
