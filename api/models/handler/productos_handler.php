@@ -137,4 +137,13 @@ class ProductoHandler
         $params = array($this->categoria);
         return Database::getRows($sql, $params);
     }
+
+    public function readStock()
+    {
+        $sql = 'SELECT existencias_producto 
+                FROM productos 
+                WHERE id_producto = ?';
+        $params = array($this->id);
+        return Database::getRow($sql, $params);
+    }
 }

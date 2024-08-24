@@ -1,47 +1,102 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import * as Constantes from '../../../utils/constantes';
-import { useFocusEffect } from '@react-navigation/native'; 
+import { useFocusEffect } from '@react-navigation/native';
 
 const ModalCompra = ({ visible, cerrarModal, nombreProductoModal, idProductoModal, cantidad, setCantidad }) => {
     const ip = Constantes.IP;
+    const [stockDisponible, setStockDisponible] = useState(0);
 
-    const handleCreateDetail = async () => {
-        try {
-            if ((cantidad < 0)) {
-                Alert.alert("Debes llenar todos los campos");
+    useEffect(() => {
+        const fetchStock = async () => {
+            console.log('ID del producto en useEffect:', idProductoModal); // Verifica el valor de idProductoModal
+
+            if (!idProductoModal) {
+                console.log('El ID del producto es nulo o vacío');
                 return;
-            } else {
+            }
+
+            try {
                 const formData = new FormData();
                 formData.append('idProducto', idProductoModal);
-                formData.append('cantidadProducto', cantidad);
 
-                const response = await fetch(`${ip}/services/public/pedido.php?action=createDetail`, {
+                console.log('Datos enviados:', {
+                    idProducto: idProductoModal
+                });
+
+                const response = await fetch(`${ip}/services/public/producto.php?action=readStock`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
 
                 const data = await response.json();
+                console.log('Respuesta del servidor:', data);
+                if (data.status) {
+                    setStockDisponible(data.stockDisponible);
+                } else {
+                    Alert.alert('Error', data.error);
+                }
+            } catch (error) {
+                console.log('Error en fetchStock:', error);
+                Alert.alert('Error', 'Ocurrió un error al obtener el stock del producto');
+            }
+        };
+
+        fetchStock();
+    }, [idProductoModal]);
+
+    const handleCreateDetail = async () => {
+        try {
+            if (cantidad < 1 || cantidad > stockDisponible) {
+                Alert.alert("Cantidad no válida", `Solo hay ${stockDisponible} unidades disponibles.`);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('idProducto', idProductoModal);
+            formData.append('cantidadProducto', cantidad);
+
+            console.log('Datos enviados a createDetail:', {
+                idProducto: idProductoModal,
+                cantidadProducto: cantidad
+            });
+
+            const response = await fetch(`${ip}/services/public/pedido.php?action=createDetail`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            const text = await response.text(); // Obtener la respuesta como texto
+            console.log('Respuesta cruda del servidor a createDetail:', text);
+
+            try {
+                const data = JSON.parse(text); // Intentar analizar el texto como JSON
+                console.log('Respuesta del servidor a createDetail:', data);
+
                 if (data.status) {
                     Alert.alert('Datos Guardados correctamente');
                     cerrarModal(false);
                 } else {
                     Alert.alert('Error', data.error);
                 }
+            } catch (jsonError) {
+                console.error('Error al analizar JSON:', jsonError);
+                Alert.alert('Error', 'Respuesta del servidor no es un JSON válido');
             }
         } catch (error) {
+            console.log('Error en handleCreateDetail:', error);
             Alert.alert('Ocurrió un error al crear detalle');
         }
     };
 
     const handleCancelCarrito = () => {
+        setCantidad(''); // Resetea el estado de cantidad
         cerrarModal(false);
     };
 
     useFocusEffect(
         React.useCallback(() => {
-            // Restablecer los estados de usuario y contrasenia cuando la pantalla se enfoca
-            cantidad
+            setCantidad('');
         }, [])
     );
 

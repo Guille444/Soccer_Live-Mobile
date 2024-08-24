@@ -17,6 +17,7 @@ class ProductoData extends ProductoHandler
     /*
      *   Métodos para validar y establecer los datos.
      */
+    
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {

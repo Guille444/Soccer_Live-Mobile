@@ -9,7 +9,7 @@ require_once('../../models/handler/pedidos_handler.php');
 class PedidoData extends PedidoHandler
 {
     // Atributo genérico para manejo de errores.
-    private $data_error = null;
+    protected $data_error = null;
 
     /*
     *   Métodos para validar y establecer los datos.
@@ -21,7 +21,7 @@ class PedidoData extends PedidoHandler
             $this->id = $value;
             return true;
         } else {
-            $this->data_error = 'El identificador del comentario es incorrecto';
+            $this->data_error = 'El identificador del pedido es incorrecto';
             return false;
         }
     }

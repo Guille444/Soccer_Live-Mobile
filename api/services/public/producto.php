@@ -28,6 +28,19 @@ if (isset($_GET['action'])) {
                 $result['error'] = 'Producto inexistente';
             }
             break;
+        case 'readStock':
+            error_log('ID del producto recibido: ' . print_r($_POST['idProducto'], true)); // Imprime el valor recibido en el log del servidor
+            if (!$producto->setId($_POST['idProducto'])) {
+                $result['error'] = $producto->getDataError();
+                error_log("Error en setId: " . $producto->getDataError()); // Imprime el error en el log del servidor
+            } elseif ($result['dataset'] = $producto->readStock()) {
+                $result['status'] = 1;
+                $result['stockDisponible'] = $result['dataset']['existencias_producto']; // Ajusta según el nombre del campo en la base de datos
+            } else {
+                $result['error'] = 'Identificador del producto incorrecto';
+                error_log("Error: Identificador del producto incorrecto"); // Imprime el mensaje de error en el log del servidor
+            }
+            break;
         default:
             $result['error'] = 'Acción no disponible';
     }

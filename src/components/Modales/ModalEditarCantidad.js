@@ -2,24 +2,45 @@ import React, { useState } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import * as Constantes from '../../../utils/constantes';
 
-const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, setCantidadProductoCarrito, cantidadProductoCarrito, getDetalleCarrito }) => {
-
+const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, idProducto, setCantidadProductoCarrito, cantidadProductoCarrito, getDetalleCarrito }) => {
   const ip = Constantes.IP;
 
   const handleUpdateDetalleCarrito = async () => {
     try {
-      if (cantidadProductoCarrito <= 0) {
-        Alert.alert("La cantidad no puede ser igual o menor a 0");
+      const cantidad = parseInt(cantidadProductoCarrito, 10);
+
+      if (isNaN(cantidad) || cantidad <= 0) {
+        Alert.alert("La cantidad debe ser un número positivo");
+        return;
+      }
+
+      // Fetch para obtener el stock disponible
+      const formDataStock = new FormData();
+      formDataStock.append('idProducto', idProducto); // Asegúrate de que idProducto esté disponible
+      const responseStock = await fetch(`${ip}/services/public/pedido.php?action=readStock`, {
+        method: 'POST',
+        body: formDataStock,
+      });
+
+      const dataStock = await responseStock.json();
+
+      if (!dataStock.status) {
+        Alert.alert('Error al obtener stock', dataStock.error || 'No se pudo obtener la información de stock.');
+        return;
+      }
+
+      if (cantidad > dataStock.stockDisponible) {
+        Alert.alert("Cantidad no válida", `Solo hay ${dataStock.stockDisponible} unidades disponibles.`);
         return;
       }
 
       const formData = new FormData();
       formData.append('idDetalle', idDetalle);
-      formData.append('cantidadProducto', cantidadProductoCarrito);
+      formData.append('cantidadProducto', cantidad);
 
       const response = await fetch(`${ip}/services/public/pedido.php?action=updateDetail`, {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const data = await response.json();
@@ -31,7 +52,7 @@ const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, setCant
       }
       setModalVisible(false);
     } catch (error) {
-      Alert.alert("Error en editar carrito", error);
+      Alert.alert("Error en editar carrito", error.message);
       setModalVisible(false);
     }
   };

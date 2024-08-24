@@ -16,6 +16,8 @@ class PedidoHandler
     protected $producto = null;
     protected $cantidad = null;
     protected $estado = null;
+    // Agregar a la clase PedidoHandler
+    protected $data_error = null;
 
     /*
     *   ESTADOS DEL PEDIDO
@@ -44,6 +46,12 @@ class PedidoHandler
         }
     }
 
+    // Método para obtener el error
+    public function getDataError()
+    {
+        return $this->data_error;
+    }
+
     // Método para iniciar un pedido en proceso.
     public function startOrder()
     {
@@ -63,14 +71,39 @@ class PedidoHandler
     }
 
     // Método para agregar un producto al carrito de compras.
+
     public function createDetail()
     {
-        // Se realiza una subconsulta para obtener el precio del producto.
-        $sql = 'INSERT INTO detalle_pedidos(id_producto, precio_producto, cantidad_producto, id_pedido)
-                VALUES(?, (SELECT precio_producto FROM productos WHERE id_producto = ?), ?, ?)';
-        $params = array($this->producto, $this->producto, $this->cantidad, $_SESSION['idPedido']);
-        return Database::executeRow($sql, $params);
+        // Inicia la transacción
+        Database::executeRow('START TRANSACTION', []);
+
+        try {
+            // Inserta en detalle_pedidos
+            $sql = 'INSERT INTO detalle_pedidos (id_producto, precio_producto, cantidad_producto, id_pedido)
+                VALUES (?, (SELECT precio_producto FROM productos WHERE id_producto = ?), ?, ?)';
+            $params = array($this->producto, $this->producto, $this->cantidad, $_SESSION['idPedido']);
+            if (!Database::executeRow($sql, $params)) {
+                throw new Exception('Error al agregar detalle del pedido');
+            }
+
+            // Actualiza el stock de productos
+            $sqlUpdate = 'UPDATE productos SET existencias_producto = existencias_producto - ? WHERE id_producto = ?';
+            $paramsUpdate = array($this->cantidad, $this->producto);
+            if (!Database::executeRow($sqlUpdate, $paramsUpdate)) {
+                throw new Exception('Error al actualizar stock del producto');
+            }
+
+            // Confirma la transacción
+            Database::executeRow('COMMIT', []);
+            return true;
+        } catch (Exception $e) {
+            // Revertir la transacción en caso de error
+            Database::executeRow('ROLLBACK', []);
+            $this->data_error = $e->getMessage();
+            return false;
+        }
     }
+
 
     // Método para obtener los productos que se encuentran en el carrito de compras.
     public function readDetail()
@@ -98,12 +131,24 @@ class PedidoHandler
     // Método para actualizar la cantidad de un producto agregado al carrito de compras.
     public function updateDetail()
     {
+        // Verifica el stock disponible
+        $sqlStock = 'SELECT existencias_producto FROM productos WHERE id_producto = ?';
+        $paramsStock = array($this->id);
+        $stock = Database::getRow($sqlStock, $paramsStock)['existencias_producto'];
+
+        if ($this->cantidad > $stock) {
+            $this->data_error = 'Cantidad excede el stock disponible';
+            return false;
+        }
+
+        // Actualiza el detalle del carrito
         $sql = 'UPDATE detalle_pedidos
-                SET cantidad_producto = ?
-                WHERE id_detalle = ? AND id_pedido = ?';
+            SET cantidad_producto = ?
+            WHERE id_detalle = ? AND id_pedido = ?';
         $params = array($this->cantidad, $this->id_detalle, $_SESSION['idPedido']);
         return Database::executeRow($sql, $params);
     }
+
 
     // Método para eliminar un producto que se encuentra en el carrito de compras.
     public function deleteDetail()
@@ -161,5 +206,59 @@ class PedidoHandler
         //$_SESSION['idmod'] = $data['id_modelo'];
 
         return $data;
+    }
+
+    // Método para cancelar un pedido y reponer el stock
+    public function cancelOrder()
+    {
+        // Obtener los detalles del pedido
+        $sql = 'SELECT id_producto, cantidad_producto FROM detalle_pedidos WHERE id_pedido = ?';
+        $params = array($_SESSION['idPedido']);
+        $details = Database::getRows($sql, $params);
+
+        // Inicia la transacción
+        Database::executeRow('START TRANSACTION', []);
+
+        try {
+            // Reponer el stock de productos
+            foreach ($details as $detail) {
+                $sqlUpdate = 'UPDATE productos SET existencias_producto = existencias_producto + ? WHERE id_producto = ?';
+                $paramsUpdate = array($detail['cantidad_producto'], $detail['id_producto']);
+                if (!Database::executeRow($sqlUpdate, $paramsUpdate)) {
+                    throw new Exception('Error al reponer stock del producto');
+                }
+            }
+
+            // Eliminar el pedido
+            $sqlDelete = 'DELETE FROM pedidos WHERE id_pedido = ?';
+            $paramsDelete = array($_SESSION['idPedido']);
+            if (!Database::executeRow($sqlDelete, $paramsDelete)) {
+                throw new Exception('Error al eliminar el pedido');
+            }
+
+            // Eliminar los detalles del pedido
+            $sqlDeleteDetails = 'DELETE FROM detalle_pedidos WHERE id_pedido = ?';
+            if (!Database::executeRow($sqlDeleteDetails, $paramsDelete)) {
+                throw new Exception('Error al eliminar detalles del pedido');
+            }
+
+            // Confirmar la transacción
+            Database::executeRow('COMMIT', []);
+            return true;
+        } catch (Exception $e) {
+            // Revertir la transacción en caso de error
+            Database::executeRow('ROLLBACK', []);
+            $this->data_error = $e->getMessage();
+            return false;
+        }
+    }
+
+    public function readStock()
+    {
+        $sql = 'SELECT existencias_producto 
+                FROM productos 
+                WHERE id_producto = ?';
+        $params = array($this->id);
+        return Database::getRow($sql, $params);
     }
 }

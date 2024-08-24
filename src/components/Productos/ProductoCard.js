@@ -1,45 +1,37 @@
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { StatusBar } from 'react-native';
 
-import { StatusBar, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, FlatList, ScrollView, SafeAreaView, Image } from 'react-native';
-import { useState, useEffect } from 'react';
-import { FontAwesome } from '@expo/vector-icons'; // Importamos el ícono
-
-//recibimos por props la imagen del producto, nombre, precio y otras propiedades de productos para mostrarlas en el componente de 
-//productoCard
-
-
-export default function ProductoCard({ ip, imagenProducto, idProducto, nombreProducto, descripcionProducto
-  , precioProducto, existenciasProducto, accionBotonProducto
-}) {
-
-
-  console.log('Valor imagen', imagenProducto)
-
+export default function ProductoCard({ ip, imagenProducto, idProducto, nombreProducto, descripcionProducto, precioProducto, existenciasProducto, accionBotonProducto, mostrarComentarios }) {
   return (
-
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: `${ip}/images/productos/${imagenProducto}` }}
           style={styles.image}
-          resizeMode="contain" // Ajustar la imagen al contenedor
+          resizeMode="contain"
         />
       </View>
-      <Text style={styles.text}>{idProducto}</Text>
       <Text style={styles.textTitle}>{nombreProducto}</Text>
       <Text style={styles.text}>{descripcionProducto}</Text>
       <Text style={styles.textTitle}>Precio: <Text style={styles.textDentro}>${precioProducto}</Text></Text>
-      <Text style={styles.textTitle}>Existencias: <Text style={styles.textDentro}>{existenciasProducto} {(existenciasProducto === 1) ? 'Unidad' : 'Unidades'}</Text></Text>
+      <Text style={styles.textTitle}>Existencias: <Text style={styles.textDentro}>{existenciasProducto} {existenciasProducto === 1 ? 'Unidad' : 'Unidades'}</Text></Text>
       <TouchableOpacity
         style={styles.cartButton}
         onPress={accionBotonProducto}>
         <FontAwesome name="plus-circle" size={24} color="white" />
         <Text style={styles.cartButtonText}>Seleccionar Producto</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.commentButton}
+        onPress={() => mostrarComentarios(idProducto)}>
+        <FontAwesome name="comment" size={24} color="white" />
+        <Text style={styles.commentButtonText}>Ver Comentarios</Text>
+      </TouchableOpacity>
     </View>
-
   );
 }
-
 
 const styles = StyleSheet.create({
   containerFlat: {
@@ -75,32 +67,8 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     fontSize: 16,
-    marginBottom: 8, fontWeight: '700'
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 8,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 8,
-    marginLeft: 8,
-  },
-  button: {
-    backgroundColor: '#AF8260',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '700'
   },
   image: {
     width: '65%',
@@ -110,7 +78,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     alignItems: 'center', // Centrar imagen horizontalmente
-  }, textDentro: {
+  },
+  textDentro: {
     fontWeight: '400'
   },
   cartButton: {
@@ -130,5 +99,20 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     textAlign: 'center'
   },
+  commentButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#458CC6',
+    borderRadius: 150,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginVertical: 10,
+  },
+  commentButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
+    textAlign: 'center',
+  },
 });
-
