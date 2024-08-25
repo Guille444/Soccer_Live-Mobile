@@ -15,6 +15,7 @@ class PedidoData extends PedidoHandler
     *   Métodos para validar y establecer los datos.
     */
 
+        // Método para validar y establecer el ID del pedido.
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -26,6 +27,7 @@ class PedidoData extends PedidoHandler
         }
     }
 
+        // Método para validar y establecer el ID del pedido.
     public function setIdPedido($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -37,6 +39,7 @@ class PedidoData extends PedidoHandler
         }
     }
 
+        // Método para validar y establecer el ID del detalle del pedido.
     public function setIdDetalle($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -48,6 +51,7 @@ class PedidoData extends PedidoHandler
         }
     }
 
+        // Método para validar y establecer el ID del cliente.
     public function setCliente($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -59,6 +63,7 @@ class PedidoData extends PedidoHandler
         }
     }
 
+        // Método para validar y establecer el ID del producto.
     public function setProducto($producto)
     {
         if (is_numeric($producto) && $producto > 0) {
@@ -71,6 +76,7 @@ class PedidoData extends PedidoHandler
         }
     }
 
+        // Método para validar y establecer la cantidad del producto en el pedido.
     public function setCantidad($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -88,16 +94,17 @@ class PedidoData extends PedidoHandler
         return $this->data_error;
     }
 
+        // Método para validar y establecer el estado del pedido.
     public function setEstado($value, $min = 2, $max = 50)
     {
-        if (!Validator::validateAlphabetic($value)) {
+        if (!Validator::validateAlphabetic($value)) {  // Verifica que el estado sea un valor alfabético.
             $this->data_error = 'El estado debe ser un valor alfabético';
             return false;
-        } elseif (Validator::validateLength($value, $min, $max)) {
+        } elseif (Validator::validateLength($value, $min, $max)) {  // Verifica que la longitud del estado sea válida.
             $this->estado = $value;
             return true;
         } else {
-            $this->data_error = 'El estado debe tener una longitud entre ' . $min . ' y ' . $max;
+            $this->data_error = 'El estado debe tener una longitud entre ' . $min . ' y ' . $max; // Mensaje de error si la longitud no es válida.
             return false;
         }
     }

@@ -17,6 +17,8 @@ class MarcaData extends MarcaHandler
     /*
      *  Métodos para validar y establecer los datos.
      */
+
+         // Método para establecer el ID de la marca, validando que sea un número natural.
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -27,7 +29,7 @@ class MarcaData extends MarcaHandler
             return false;
         }
     }
-
+    // Método para establecer el nombre de la marca, validando que sea alfanumérico, único y dentro de un rango de longitud.
     public function setNombre($value, $min = 2, $max = 50)
     {
         if (!Validator::validateAlphanumeric($value)) {
@@ -51,7 +53,7 @@ class MarcaData extends MarcaHandler
         }
     }
 
-
+    // Método para establecer el correo electrónico de la marca, validando su formato, longitud y que no sea duplicado.
     public function setCorreo($value, $min = 8, $max = 100)
     {
         // Primero, verificar si el correo ya existe
@@ -76,6 +78,7 @@ class MarcaData extends MarcaHandler
         }
     }
 
+    // Método para establecer la imagen de la marca, validando el archivo y asignando un nombre adecuado.
     public function setImagen($file, $filename = null)
     {
         if (Validator::validateImageFile($file, 100)) {
@@ -93,6 +96,7 @@ class MarcaData extends MarcaHandler
         }
     }
 
+    // Método para establecer el nombre del archivo de imagen desde la base de datos.
     public function setFilename()
     {
         if ($data = $this->readFilename()) {
@@ -111,7 +115,7 @@ class MarcaData extends MarcaHandler
     {
         return $this->data_error;
     }
-
+    // Método para obtener el nombre del archivo de imagen.
     public function getFilename()
     {
         return $this->filename;
