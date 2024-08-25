@@ -14,6 +14,8 @@ class ClienteData extends ClienteHandler
     /*
     *   Métodos para validar y establecer los datos.
     */
+
+        // Método para establecer el ID del cliente, validando que sea un número natural.
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -25,6 +27,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el nombre del cliente, validando que sea alfabético y dentro de un rango de longitud.
     public function setNombre($value, $min = 2, $max = 50)
     {
         if (!Validator::validateAlphabetic($value)) {
@@ -39,6 +42,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el apellido del cliente, similar a la validación del nombre.
     public function setApellido($value, $min = 2, $max = 50)
     {
         if (!Validator::validateAlphabetic($value)) {
@@ -53,6 +57,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer la dirección del cliente, validando caracteres permitidos y longitud.
     public function setDireccion($value, $min = 2, $max = 250)
     {
         if (!Validator::validateString($value)) {
@@ -67,6 +72,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el teléfono del cliente, validando su formato.
     public function setTelefono($value)
     {
         if (Validator::validatePhone($value)) {
@@ -78,6 +84,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el correo electrónico del cliente, con validación de formato, longitud y duplicados.
     public function setCorreo($value, $min = 8, $max = 100)
     {
         if (!Validator::validateEmail($value)) {
@@ -95,6 +102,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el correo de recuperación del cliente, similar al correo principal pero sin verificar duplicados.
     public function setCorreoRecuperacion($value, $min = 8, $max = 100)
     {
         if (!Validator::validateEmail($value)) {
@@ -109,6 +117,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer la clave del cliente, validando el formato y aplicando hash.
     public function setClave($value)
     {
         if (Validator::validatePassword($value)) {
@@ -120,6 +129,7 @@ class ClienteData extends ClienteHandler
         }
     }
 
+        // Método para establecer el estado del cliente, validando que sea un valor booleano.
     public function setEstado($value)
     {
         if (Validator::validateBoolean($value)) {

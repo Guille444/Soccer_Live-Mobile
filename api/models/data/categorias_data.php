@@ -17,6 +17,8 @@ class CategoriaData extends CategoriaHandler
     /*
      *  Métodos para validar y establecer los datos.
      */
+
+         // Método para establecer el ID de la categoría, validando que sea un número natural.
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -27,7 +29,7 @@ class CategoriaData extends CategoriaHandler
             return false;
         }
     }
-
+        // Método para establecer el nombre de la categoría, con validaciones de duplicados, formato alfanumérico y longitud.
     public function setNombre($value, $min = 2, $max = 50)
     {
         // Primero, verificar si el nombre ya existe
@@ -52,8 +54,10 @@ class CategoriaData extends CategoriaHandler
         }
     }
 
+        // Método para establecer la imagen de la categoría, validando el archivo y asignando un nombre.
     public function setImagen($file, $filename = null)
     {
+            // Validar que el archivo de imagen sea válido y no exceda el tamaño máximo
         if (Validator::validateImageFile($file, 100)) {
             $this->imagen = Validator::getFilename();
             return true;
@@ -69,6 +73,7 @@ class CategoriaData extends CategoriaHandler
         }
     }
 
+        // Método para establecer la descripción de la categoría, con validaciones de caracteres y longitud.
     public function setDescripcion($value, $min = 2, $max = 250)
     {
         if (!$value) {
@@ -85,6 +90,7 @@ class CategoriaData extends CategoriaHandler
         }
     }
 
+        // Método para recuperar y establecer el nombre del archivo de imagen de la categoría.
     public function setFilename()
     {
         if ($data = $this->readFilename()) {
@@ -103,7 +109,7 @@ class CategoriaData extends CategoriaHandler
     {
         return $this->data_error;
     }
-
+    // Método para obtener el nombre del archivo de imagen asociado a la categoría.
     public function getFilename()
     {
         return $this->filename;

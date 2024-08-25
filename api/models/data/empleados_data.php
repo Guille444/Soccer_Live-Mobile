@@ -14,6 +14,8 @@ class EmpleadoData extends EmpleadoHandler
     /*
      *  Métodos para validar y asignar valores de los atributos.
      */
+
+         // Método para establecer el ID del empleado, validando que sea un número natural.
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -25,7 +27,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
-
+    // Método para establecer el nombre del empleado, validando que sea alfabético y tenga una longitud adecuada.
     public function setNombre($value, $min = 2, $max = 50)
     {
         if (!Validator::validateAlphabetic($value)) {
@@ -40,6 +42,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
+    // Método para establecer el apellido del empleado, con validaciones similares a las del nombre.
     public function setApellido($value, $min = 2, $max = 50)
     {
         if (!Validator::validateAlphabetic($value)) {
@@ -54,6 +57,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
+        // Método para establecer el DUI del empleado, validando su formato y evitando duplicados.
     public function setDUI($value)
     {
         if (!Validator::validateDUI($value)) {
@@ -68,6 +72,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
+        // Método para establecer el correo electrónico del empleado, validando formato, longitud y duplicados.
     public function setCorreo($value, $min = 8, $max = 100)
     {
         if (!Validator::validateEmail($value)) {
@@ -85,6 +90,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
+        // Método para establecer el teléfono del empleado, validando duplicados y formato.
     public function setTelefono($value)
     {
         // Primero, verificar si el teléfono ya existe
@@ -104,7 +110,7 @@ class EmpleadoData extends EmpleadoHandler
         }
     }
 
-
+    // Método para establecer la clave del empleado, validando y aplicando hash.
     public function setClave($value)
     {
         if (Validator::validatePassword($value)) {
