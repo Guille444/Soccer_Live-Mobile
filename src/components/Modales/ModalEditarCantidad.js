@@ -7,6 +7,7 @@ const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, idProdu
 
   const handleUpdateDetalleCarrito = async () => {
     try {
+      // Convertir la cantidad a número entero
       const cantidad = parseInt(cantidadProductoCarrito, 10);
 
       if (isNaN(cantidad) || cantidad <= 0) {
@@ -14,26 +15,38 @@ const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, idProdu
         return;
       }
 
-      // Fetch para obtener el stock disponible
+      console.log('ID del producto antes de enviar:', idProducto);
+
+      if (idProducto === undefined || idProducto === null) {
+        Alert.alert('ID del producto no definido');
+        return;
+      }
+
+      // Solicitud para obtener stock disponible
       const formDataStock = new FormData();
-      formDataStock.append('idProducto', idProducto); // Asegúrate de que idProducto esté disponible
+      formDataStock.append('idProducto', idProducto);
+
       const responseStock = await fetch(`${ip}/services/public/pedido.php?action=readStock`, {
         method: 'POST',
         body: formDataStock,
       });
 
-      const dataStock = await responseStock.json();
+      const dataStock = await responseStock.text();
+      console.log('Respuesta del stock:', dataStock);
 
-      if (!dataStock.status) {
-        Alert.alert('Error al obtener stock', dataStock.error || 'No se pudo obtener la información de stock.');
+      const parsedDataStock = JSON.parse(dataStock);
+
+      if (!parsedDataStock.status) {
+        Alert.alert('Error al obtener stock', parsedDataStock.error || 'No se pudo obtener la información de stock.');
         return;
       }
 
-      if (cantidad > dataStock.stockDisponible) {
-        Alert.alert("Cantidad no válida", `Solo hay ${dataStock.stockDisponible} unidades disponibles.`);
+      if (cantidad > parsedDataStock.stockDisponible) {
+        Alert.alert("Cantidad no válida", `Solo hay ${parsedDataStock.stockDisponible} unidades disponibles.`);
         return;
       }
 
+      // Solicitud para actualizar el detalle del carrito
       const formData = new FormData();
       formData.append('idDetalle', idDetalle);
       formData.append('cantidadProducto', cantidad);
@@ -43,13 +56,18 @@ const ModalEditarCantidad = ({ setModalVisible, modalVisible, idDetalle, idProdu
         body: formData,
       });
 
-      const data = await response.json();
-      if (data.status) {
+      const data = await response.text();
+      console.log('Respuesta de la actualización:', data);
+
+      const parsedData = JSON.parse(data);
+
+      if (parsedData.status) {
         Alert.alert('Se actualizó el detalle del producto');
         getDetalleCarrito();
       } else {
-        Alert.alert('Error al editar detalle del carrito', data.error);
+        Alert.alert('Error al editar detalle del carrito', parsedData.error);
       }
+
       setModalVisible(false);
     } catch (error) {
       Alert.alert("Error en editar carrito", error.message);

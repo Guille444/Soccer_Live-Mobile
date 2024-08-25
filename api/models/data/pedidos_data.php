@@ -14,7 +14,7 @@ class PedidoData extends PedidoHandler
     /*
     *   Métodos para validar y establecer los datos.
     */
-    
+
     public function setId($value)
     {
         if (Validator::validateNaturalNumber($value)) {
@@ -59,13 +59,14 @@ class PedidoData extends PedidoHandler
         }
     }
 
-    public function setProducto($value)
+    public function setProducto($producto)
     {
-        if (Validator::validateNaturalNumber($value)) {
-            $this->producto = $value;
+        if (is_numeric($producto) && $producto > 0) {
+            $this->producto = $producto;
             return true;
         } else {
-            $this->data_error = 'El identificador del producto es incorrecto';
+            $this->data_error = 'ID de producto inválido';
+            error_log('Error en setProducto: ' . $this->data_error);
             return false;
         }
     }

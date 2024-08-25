@@ -9,7 +9,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 
 //Configuracion del encabezado de la navegacion
 const Carrito = ({ navigation }) => {
-    
+
     useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Carrito',
@@ -22,10 +22,11 @@ const Carrito = ({ navigation }) => {
         });
     }, [navigation]);
 
-     // Definición de estados
+    // Definición de estados
     const ip = Constantes.IP;
     const [dataDetalleCarrito, setDataDetalleCarrito] = useState([]);
     const [idDetalle, setIdDetalle] = useState(null);
+    const [idProducto, setIdProducto] = useState(null);
     const [cantidadProductoCarrito, setCantidadProductoCarrito] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
@@ -39,6 +40,7 @@ const Carrito = ({ navigation }) => {
                 method: 'GET',
             });
             const data = await response.json();
+            console.log('Datos obtenidos:', data);
             if (data.status) {
                 setDataDetalleCarrito(data.dataset);
                 if (data.dataset.length === 0) {
@@ -54,7 +56,7 @@ const Carrito = ({ navigation }) => {
         }
     }, [ip]);
 
-     // UseEffect para actualizar los detalles del carrito al enfocarse en la pantalla
+    // UseEffect para actualizar los detalles del carrito al enfocarse en la pantalla
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getDetalleCarrito();
@@ -84,28 +86,36 @@ const Carrito = ({ navigation }) => {
         }
     };
 
-    // Función para manejar la edición de detalles del carrito
-    const handleEditarDetalle = (idDetalle, cantidadDetalle) => {
+    const handleEditarDetalle = (idDetalle, cantidadDetalle, idProducto) => {
+        console.log('ID Detalle:', idDetalle);
+        console.log('Cantidad Detalle:', cantidadDetalle);
+        console.log('ID Producto:', idProducto);
         setModalVisible(true);
         setIdDetalle(idDetalle);
         setCantidadProductoCarrito(cantidadDetalle);
+        setIdProducto(idProducto); // Verifica si este valor es correcto aquí
     };
 
+
     //render de elementos del carrito
-    const renderItem = ({ item }) => (
-        <CarritoCard
-            item={item}
-            modalVisible={modalVisible}
-            setModalVisible={setModalVisible}
-            setCantidadProductoCarrito={setCantidadProductoCarrito}
-            cantidadProductoCarrito={cantidadProductoCarrito}
-            idDetalle={idDetalle}
-            setIdDetalle={setIdDetalle}
-            accionBotonDetalle={handleEditarDetalle}
-            getDetalleCarrito={getDetalleCarrito}
-            updateDataDetalleCarrito={setDataDetalleCarrito}
-        />
-    );
+    const renderItem = ({ item }) => {
+        console.log('Item en renderItem:', item);
+        return (
+            <CarritoCard
+                item={item}
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+                setCantidadProductoCarrito={setCantidadProductoCarrito}
+                cantidadProductoCarrito={cantidadProductoCarrito}
+                idDetalle={idDetalle}
+                setIdDetalle={setIdDetalle}
+                setIdProducto={setIdProducto}
+                accionBotonDetalle={handleEditarDetalle}
+                getDetalleCarrito={getDetalleCarrito}
+                updateDataDetalleCarrito={setDataDetalleCarrito}
+            />
+        );
+    };
 
     //Funcion para alerta
     const showAlertWithMessage = (message, showProgressIndicator = false) => {
@@ -123,7 +133,7 @@ const Carrito = ({ navigation }) => {
                         setModalVisible={setModalVisible}
                         modalVisible={modalVisible}
                         idDetalle={idDetalle}
-                        setIdDetalle={setIdDetalle}
+                        idProducto={idProducto}  // Asegúrate de que este valor no sea undefined
                         setCantidadProductoCarrito={setCantidadProductoCarrito}
                         cantidadProductoCarrito={cantidadProductoCarrito}
                         getDetalleCarrito={getDetalleCarrito}

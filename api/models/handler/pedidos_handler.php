@@ -108,11 +108,11 @@ class PedidoHandler
     // Método para obtener los productos que se encuentran en el carrito de compras.
     public function readDetail()
     {
-        $sql = 'SELECT id_detalle, nombre_producto, detalle_pedidos.precio_producto, detalle_pedidos.cantidad_producto
-                FROM detalle_pedidos
-                INNER JOIN pedidos USING(id_pedido)
-                INNER JOIN productos USING(id_producto)
-                WHERE id_pedido = ?';
+        $sql = 'SELECT detalle_pedidos.id_detalle, productos.id_producto, productos.nombre_producto, detalle_pedidos.precio_producto, detalle_pedidos.cantidad_producto
+            FROM detalle_pedidos
+            INNER JOIN pedidos ON detalle_pedidos.id_pedido = pedidos.id_pedido
+            INNER JOIN productos ON detalle_pedidos.id_producto = productos.id_producto
+            WHERE detalle_pedidos.id_pedido = ?';
         $params = array($_SESSION['idPedido']);
         return Database::getRows($sql, $params);
     }
@@ -131,32 +131,96 @@ class PedidoHandler
     // Método para actualizar la cantidad de un producto agregado al carrito de compras.
     public function updateDetail()
     {
-        // Verifica el stock disponible
-        $sqlStock = 'SELECT existencias_producto FROM productos WHERE id_producto = ?';
-        $paramsStock = array($this->id);
-        $stock = Database::getRow($sqlStock, $paramsStock)['existencias_producto'];
+        // Paso 1: Obtener el id_producto asociado al id_detalle
+        $sqlGetProductId = 'SELECT id_producto, cantidad_producto FROM detalle_pedidos WHERE id_detalle = ? AND id_pedido = ?';
+        $paramsGetProductId = array($this->id_detalle, $_SESSION['idPedido']);
+        $row = Database::getRow($sqlGetProductId, $paramsGetProductId);
 
-        if ($this->cantidad > $stock) {
+        if (!$row) {
+            $this->data_error = 'Detalle de pedido no encontrado';
+            return false;
+        }
+
+        $id_producto = $row['id_producto'];
+        $cantidad_anterior = $row['cantidad_producto'];
+
+        // Paso 3: Verificar el stock disponible del producto
+        $sqlStock = 'SELECT existencias_producto FROM productos WHERE id_producto = ?';
+        $paramsStock = array($id_producto);
+        $stockRow = Database::getRow($sqlStock, $paramsStock);
+
+        if (!$stockRow) {
+            $this->data_error = 'Producto no encontrado';
+            return false;
+        }
+
+        $stock = $stockRow['existencias_producto'];
+
+        // Calcular la diferencia entre la cantidad nueva y la anterior
+        $diferencia_cantidad = $this->cantidad - $cantidad_anterior;
+
+        if ($diferencia_cantidad > $stock) {
             $this->data_error = 'Cantidad excede el stock disponible';
             return false;
         }
 
-        // Actualiza el detalle del carrito
+        // Paso 4: Actualizar la cantidad en el detalle del pedido
         $sql = 'UPDATE detalle_pedidos
-            SET cantidad_producto = ?
-            WHERE id_detalle = ? AND id_pedido = ?';
+        SET cantidad_producto = ?
+        WHERE id_detalle = ? AND id_pedido = ?';
         $params = array($this->cantidad, $this->id_detalle, $_SESSION['idPedido']);
-        return Database::executeRow($sql, $params);
+
+        $resultado = Database::executeRow($sql, $params);
+
+        if ($resultado) {
+            // Actualizar el stock disponible
+            $sqlUpdateStock = 'UPDATE productos SET existencias_producto = existencias_producto - ? WHERE id_producto = ?';
+            $paramsUpdateStock = array($diferencia_cantidad, $id_producto);
+            Database::executeRow($sqlUpdateStock, $paramsUpdateStock);
+        }
+
+        return $resultado;
     }
 
 
-    // Método para eliminar un producto que se encuentra en el carrito de compras.
     public function deleteDetail()
     {
-        $sql = 'DELETE FROM detalle_pedidos
-                WHERE id_detalle = ? AND id_pedido = ?';
-        $params = array($this->id_detalle, $_SESSION['idPedido']);
-        return Database::executeRow($sql, $params);
+        // Paso 1: Obtener la cantidad del producto asociado al detalle
+        $sqlGetQuantity = 'SELECT cantidad_producto FROM detalle_pedidos WHERE id_detalle = ? AND id_pedido = ?';
+        $paramsGetQuantity = array($this->id_detalle, $_SESSION['idPedido']);
+        $row = Database::getRow($sqlGetQuantity, $paramsGetQuantity);
+
+        if (!$row) {
+            $this->data_error = 'Detalle de pedido no encontrado';
+            return false;
+        }
+
+        $cantidad = $row['cantidad_producto'];
+
+        // Paso 2: Obtener el id_producto asociado al id_detalle
+        $sqlGetProductId = 'SELECT id_producto FROM detalle_pedidos WHERE id_detalle = ? AND id_pedido = ?';
+        $paramsGetProductId = array($this->id_detalle, $_SESSION['idPedido']);
+        $rowProduct = Database::getRow($sqlGetProductId, $paramsGetProductId);
+
+        if (!$rowProduct) {
+            $this->data_error = 'Producto no encontrado en el detalle';
+            return false;
+        }
+
+        $idProducto = $rowProduct['id_producto'];
+
+        // Paso 3: Devolver la cantidad al stock
+        $sqlUpdateStock = 'UPDATE productos SET existencias_producto = existencias_producto + ? WHERE id_producto = ?';
+        $paramsUpdateStock = array($cantidad, $idProducto);
+        if (!Database::executeRow($sqlUpdateStock, $paramsUpdateStock)) {
+            $this->data_error = 'No se pudo actualizar el stock del producto';
+            return false;
+        }
+
+        // Paso 4: Eliminar el detalle del pedido
+        $sqlDelete = 'DELETE FROM detalle_pedidos WHERE id_detalle = ? AND id_pedido = ?';
+        $paramsDelete = array($this->id_detalle, $_SESSION['idPedido']);
+        return Database::executeRow($sqlDelete, $paramsDelete);
     }
 
     /*
@@ -255,10 +319,10 @@ class PedidoHandler
 
     public function readStock()
     {
-        $sql = 'SELECT existencias_producto 
-                FROM productos 
-                WHERE id_producto = ?';
-        $params = array($this->id);
-        return Database::getRow($sql, $params);
+        $sql = 'SELECT existencias_producto FROM productos WHERE id_producto = ?';
+        $params = array($this->producto);
+        $result = Database::getRow($sql, $params);
+        error_log('Resultado de readStock: ' . print_r($result, true));
+        return $result;
     }
 }

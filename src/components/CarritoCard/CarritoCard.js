@@ -11,10 +11,13 @@ const CarritoCard = ({
     setCantidadProductoCarrito,
     accionBotonDetalle,
     idDetalle,
+    setIdProducto,
     setIdDetalle,
     getDetalleCarrito,
     updateDataDetalleCarrito
 }) => {
+    console.log('ID Producto en CarritoCard:', item.id_producto); // Verifica si id_producto está disponible
+
     const ip = Constantes.IP;
 
     const handleDeleteDetalleCarrito = async (idDetalle) => {
@@ -73,11 +76,17 @@ const CarritoCard = ({
             <Text style={styles.itemText}>Precio: ${item.precio_producto}</Text>
             <Text style={styles.itemText}>Cantidad: {item.cantidad_producto}</Text>
             <Text style={styles.itemText}>SubTotal: ${(parseFloat(item.cantidad_producto) * parseFloat(item.precio_producto)).toFixed(2)}</Text>
-
-            <TouchableOpacity style={styles.modifyButton} onPress={() => accionBotonDetalle(item.id_detalle, item.cantidad_producto)}>
+            <TouchableOpacity
+                style={styles.modifyButton}
+                onPress={() => {
+                    console.log('ID Detalle en onPress:', item.id_detalle);
+                    console.log('Cantidad en onPress:', item.cantidad_producto);
+                    console.log('ID Producto en onPress:', item.id_producto);
+                    accionBotonDetalle(item.id_detalle, item.cantidad_producto, item.id_producto);
+                }}
+            >
                 <Text style={styles.buttonText}>Modificar Cantidad</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteDetalleCarrito(item.id_detalle)}>
                 <Text style={styles.buttonText}>Eliminar del carrito</Text>
             </TouchableOpacity>
